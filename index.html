@@ -772,7 +772,17 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
     musicStarted=true;
     const audio=document.getElementById('bg-music');
     const btn=document.getElementById('music-btn'), icon=document.getElementById('music-icon');
-    audio.play().then(()=>{ icon.textContent='⏸'; btn.classList.add('playing'); }).catch(()=>{});
+    // fade in volume: 0 → 1 selama 4 detik
+    audio.volume=0;
+    audio.play().then(()=>{
+      icon.textContent='⏸'; btn.classList.add('playing');
+      const DUR=4000, t0=performance.now();
+      (function step(){
+        const p=Math.min(1,(performance.now()-t0)/DUR);
+        audio.volume=p*p*(3-2*p); // smoothstep
+        if(p<1 && !audio.paused) requestAnimationFrame(step);
+      })();
+    }).catch(()=>{});
   };
 
   btn.addEventListener('click', async ()=>{
