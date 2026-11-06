@@ -833,7 +833,10 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
     flame.style.opacity='0';
     flame.style.transform='translateX(-50%) scale(.3,.06)';
     if(glow){ glow.style.transition='opacity 1.8s ease'; glow.style.opacity='0'; }
-    if(wrap){ wrap.style.transition='filter 1.8s ease, opacity 1.8s ease'; wrap.style.filter='none'; }
+    // seluruh isi intro (lilin, api, glow, teks) memudar total → layar benar2 gelap
+    intro.querySelectorAll('.intro-title,.intro-fallback,.mic-level,.candle-wrap,.intro-btn').forEach(el=>{
+      el.style.transition='opacity 1.8s ease'; el.style.opacity='0';
+    });
     intro.style.transition='background 1.8s ease';
     intro.style.background='#000';
     // teks juga memudar mengikuti gelap
