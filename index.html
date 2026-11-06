@@ -442,8 +442,78 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
   100%{opacity:0;transform:translateY(-70px) rotate(18deg)}
 }
 </style>
+
+<style>
+/* ---------- candle intro ---------- */
+#candle-intro{
+  position:fixed;inset:0;z-index:100;
+  background:#0a0705;color:#e8dcc8;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem;gap:2.2rem;
+  transition:opacity 1.6s ease, visibility 1.6s ease;
+}
+#candle-intro.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.candle-wrap{position:relative;filter:drop-shadow(0 0 40px rgba(255,160,40,.25))}
+.flame{
+  width:26px;height:44px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+  background:radial-gradient(circle at 50% 75%,#fff7cc 0%,#ffd23e 40%,#ff8c1a 70%,#e8590c 100%);
+  position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
+  transform-origin:50% 100%;
+  animation:flicker 1.6s ease-in-out infinite alternate;
+  box-shadow:0 0 30px 10px rgba(255,170,40,.55),0 0 90px 40px rgba(255,120,20,.25);
+}
+.flame::after{
+  content:"";position:absolute;left:50%;bottom:4px;transform:translateX(-50%);
+  width:8px;height:16px;border-radius:50%;
+  background:rgba(70,160,255,.75);filter:blur(2px);
+}
+@keyframes flicker{
+  0%{transform:translateX(-50%) scale(1) rotate(-2deg)}
+  50%{transform:translateX(-50%) scale(1.06,1.1) rotate(2deg)}
+  100%{transform:translateX(-50%) scale(.96,1.02) rotate(-1deg)}
+}
+.candle-body{
+  width:34px;height:130px;border-radius:8px 8px 4px 4px;
+  background:linear-gradient(90deg,#f5ead2,#e8d9b5 60%,#d8c49a);
+  position:relative;
+}
+.candle-body::before{ /* wick */
+  content:"";position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
+  width:3px;height:12px;background:#3a2a1a;border-radius:2px;
+}
+.candle-glow{
+  position:absolute;inset:-80px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,170,60,.18) 0%,transparent 65%);
+  animation:glowPulse 2.4s ease-in-out infinite alternate;
+}
+@keyframes glowPulse{from{opacity:.7;transform:scale(1)}to{opacity:1;transform:scale(1.12)}}
+.intro-title{font-family:'Dancing Script',cursive;font-size:1.9rem;line-height:1.35}
+.intro-hint{font-size:.95rem;opacity:.75;max-width:340px}
+.mic-level{width:min(260px,70vw);height:6px;border-radius:3px;background:#2a2018;overflow:hidden}
+.mic-level>div{height:100%;width:0%;background:linear-gradient(90deg,#ffb347,#ff5e3a);transition:width .08s linear}
+.intro-btn{
+  margin-top:.4rem;padding:.75rem 1.6rem;border-radius:999px;border:1px solid #6b5236;
+  background:#1c130b;color:#e8dcc8;font-family:'Outfit',sans-serif;font-size:1rem;cursor:pointer;
+}
+.intro-btn:hover{background:#2a1d10}
+.intro-fallback{font-size:.8rem;opacity:.5}
+@media (prefers-reduced-motion:reduce){.flame,.candle-glow{animation:none}}
+</style>
 </head>
 <body>
+
+<!-- CANDLE INTRO -->
+<div id="candle-intro">
+  <div class="candle-wrap">
+    <div class="candle-glow"></div>
+    <div class="flame" id="flame"></div>
+    <div class="candle-body"></div>
+  </div>
+  <p class="intro-title">Sebelum halaman terbuka…<br>tiup lilinnya dulu ya 🕯️</p>
+  <div class="mic-level"><div id="micbar"></div></div>
+  <button class="intro-btn" id="micBtn">Aktifkan Microphone & Tiup</button>
+  <p class="intro-fallback" id="introFallback"></p>
+</div>
 
 <div class="hearts" aria-hidden="true"></div>
 <canvas id="confetti" aria-hidden="true"></canvas>
@@ -682,6 +752,72 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
     s.style.animationDelay = (Math.random()*10)+'s';
     s.style.fontSize = (0.8+Math.random()*1.4)+'rem';
     wrap.appendChild(s);
+  }
+})();
+
+// ---------- candle intro: mic blow detection ----------
+(function(){
+  const intro=document.getElementById('candle-intro'),
+        flame=document.getElementById('flame'),
+        btn=document.getElementById('micBtn'),
+        bar=document.getElementById('micbar'),
+        fallback=document.getElementById('introFallback');
+  const BLOW_THRESHOLD=0.55; // volume RMS untuk mematikan api (0-1)
+  let blown=false;
+
+  btn.addEventListener('click', async ()=>{
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+      const ctx=new (window.AudioContext||window.webkitAudioContext)();
+      const src=ctx.createMediaStreamSource(stream);
+      const analyser=ctx.createAnalyser();
+      analyser.fftSize=1024;
+      src.connect(analyser);
+      const buf=new Float32Array(analyser.fftSize);
+      btn.style.display='none';
+      listen();
+
+      function listen(){
+        analyser.getFloatTimeDomainData(buf);
+        let sum=0;
+        for(let i=0;i<buf.length;i++) sum+=buf[i]*buf[i];
+        const rms=Math.sqrt(sum/buf.length);
+        const level=Math.min(1, rms*4);
+        bar.style.width=(level*100)+'%';
+
+        if(!blown){
+          // goyang api sesuai volume
+          const sway=level*22;
+          flame.style.animation='none';
+          flame.style.transform=`translateX(-50%) rotate(${(Math.random()*2-1)*sway}deg) scale(${1-level*0.25},${1-level*0.15})`;
+          if(level>BLOW_THRESHOLD){
+            blown=true;
+            extinguish(stream,ctx);
+            return;
+          }
+        }
+        requestAnimationFrame(listen);
+      }
+    }catch(e){
+      fallback.textContent='Microphone tidak tersedia — tap di sini untuk masuk tanpa meniup lilin 🎉';
+      fallback.style.cursor='pointer';
+      btn.style.display='none';
+      fallback.addEventListener('click', enter, {once:true});
+    }
+  });
+
+  function extinguish(stream,ctx){
+    flame.style.transition='opacity .5s ease, transform .5s ease';
+    flame.style.opacity='0';
+    flame.style.transform='translateX(-50%) scale(.2,.05)';
+    stream.getTracks().forEach(t=>t.stop());
+    ctx.close();
+    setTimeout(enter, 900);
+  }
+
+  function enter(){
+    intro.classList.add('hidden');
+    setTimeout(()=>intro.remove(), 1800);
   }
 })();
 
