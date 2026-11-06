@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selamat Ulang Tahun ke-25 💐</title>
+<meta name="description" content="Sebuah halaman kecil, untuk hari yang besar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#E11D48; --on-primary:#FFFFFF;
+  --secondary:#FB7185;
+  --accent:#EA580C;
+  --bg:#FFF1F2; --fg:#881337;
+  --card:#FFFFFF; --cardfg:#881337;
+  --muted:#FDF2F4; --mutedfg:#8A5563;
+  --border:#FECDD3;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Work Sans',sans-serif;
+  background:var(--bg); color:var(--fg);
+  line-height:1.6; overflow-x:hidden;
+}
+h1,h2,h3,.display{font-family:'Outfit',sans-serif}
+.hand{font-family:'Dancing Script',cursive}
+img{max-width:100%;display:block}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+
+/* ---------- floating hearts ---------- */
+.hearts{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.heart{position:absolute;bottom:-40px;font-size:1.2rem;opacity:.55;animation:rise linear infinite}
+@keyframes rise{
+  0%{transform:translateY(0) rotate(0deg);opacity:0}
+  10%{opacity:.5} 90%{opacity:.4}
+  100%{transform:translateY(-110vh) rotate(360deg);opacity:0}
+}
+
+/* ---------- confetti canvas ---------- */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
+
+/* ---------- hero ---------- */
+.hero{
+  min-height:100svh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:2rem 1.5rem;position:relative;z-index:2;overflow:hidden;
+  background:linear-gradient(160deg,#FFF1F2 0%,#FFE4E6 50%,#FECDD3 100%);
+}
+.hero-photo-frame{
+  position:relative;width:min(300px,72vw);aspect-ratio:1;
+  margin-bottom:2rem;border-radius:50%;
+  padding:8px;
+  background:conic-gradient(from 0deg,var(--primary),var(--accent),var(--secondary),var(--primary));
+  animation:spin 14s linear infinite, fadeUp .9s ease both;
+  box-shadow:0 18px 60px rgba(225,29,72,.28);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero-photo-frame .inner{
+  border-radius:50%;overflow:hidden;width:100%;height:100%;
+  animation:spin 14s linear infinite reverse;
+  border:6px solid #fff;
+}
+.hero-photo-frame img{width:100%;height:100%;object-fit:cover}
+.badge{
+  display:inline-block;background:var(--card);color:var(--primary);
+  border:1px solid var(--border);border-radius:999px;
+  padding:.45rem 1.2rem;font-size:.9rem;font-weight:600;
+  letter-spacing:.05em;margin-bottom:1.6rem;
+  box-shadow:0 2px 12px rgba(225,29,72,.08);
+  animation:fadeUp .8s ease both;
+}
+.hero h1{
+  font-size:clamp(2.6rem,8vw,5rem);font-weight:800;
+  line-height:1.1;letter-spacing:-.02em;
+  animation:fadeUp .8s .15s ease both;
+}
+.hero h1 .age{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  font-size:clamp(3.2rem,11vw,6.5rem);
+}
+.hero .sub{
+  max-width:34rem;margin:1.4rem auto 2.4rem;
+  font-size:1.05rem;color:var(--mutedfg);font-weight:300;
+  animation:fadeUp .8s .3s ease both;
+}
+.hero .hand-line{
+  font-family:'Dancing Script',cursive;font-size:clamp(1.4rem,4vw,2rem);
+  color:var(--primary);margin-bottom:1.2rem;
+  animation:fadeUp .8s .25s ease both;
+}
+.scroll-cue{
+  animation:fadeUp .8s .5s ease both, bob 2.2s 1.5s ease-in-out infinite;
+  font-size:.85rem;color:var(--mutedfg);letter-spacing:.15em;text-transform:uppercase;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+
+/* ---------- sections ---------- */
+section{position:relative;z-index:2;padding:5rem 1.5rem;max-width:60rem;margin:0 auto}
+.section-label{
+  text-align:center;font-size:.85rem;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--secondary);margin-bottom:.8rem;
+}
+.section-title{text-align:center;font-size:clamp(1.7rem,5vw,2.6rem);font-weight:700;margin-bottom:1rem}
+.section-sub{text-align:center;color:var(--mutedfg);max-width:32rem;margin:0 auto 3rem;font-weight:300}
+
+/* reveal on scroll */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+/* keep scrapbook tilt on polaroids through the reveal animation */
+.polaroid.reveal{transform:rotate(var(--tilt)) translateY(28px)}
+.polaroid.reveal.in{transform:rotate(var(--tilt))}
+
+/* ---------- letter ---------- */
+.letter{
+  background:var(--card);border:1px solid var(--border);border-radius:1.5rem;
+  padding:clamp(1.8rem,5vw,3.2rem);box-shadow:0 10px 40px rgba(225,29,72,.07);
+  position:relative;
+}
+.letter::before{
+  content:'“';position:absolute;top:-.4rem;left:1.4rem;
+  font-family:'Outfit';font-size:6rem;color:var(--border);line-height:1;
+}
+.letter .salut{font-family:'Dancing Script',cursive;font-size:1.7rem;color:var(--primary);margin-bottom:.8rem}
+.letter p{margin-bottom:1.1rem;font-size:1.02rem}
+.letter .sign{font-family:'Dancing Script',cursive;color:var(--primary);text-align:right;margin-top:1.6rem;font-size:1.7rem}
+
+/* ---------- gallery : horizontal journey ---------- */
+.gal-sec{max-width:100%;padding-left:0;padding-right:0}
+.gal-sec .section-label,.gal-sec .section-title,.gal-sec .section-sub,
+.gal-sec .gallery-extra{padding-left:1.5rem;padding-right:1.5rem}
+.journey{
+  position:relative;
+  background:
+    radial-gradient(ellipse 60% 40% at 12% 8%, rgba(251,113,133,.13), transparent 60%),
+    radial-gradient(ellipse 55% 35% at 88% 30%, rgba(234,88,12,.09), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 30% 85%, rgba(212,165,116,.12), transparent 60%),
+    repeating-linear-gradient(0deg, transparent 0 2px, rgba(136,19,55,.014) 2px 4px);
+  border-radius:2rem;
+  padding:2.4rem 0 1.8rem;
+}
+.journey-track{
+  display:flex;align-items:center;gap:1.1rem;
+  overflow-x:auto;overflow-y:visible;
+  padding:2.6rem 3rem 3.4rem;
+  scroll-snap-type:x proximity;
+  scrollbar-width:none;
+  cursor:grab;
+}
+.journey-track::-webkit-scrollbar{display:none}
+.journey-track.dragging{cursor:grabbing;scroll-snap-type:none}
+.j-start,.j-end{
+  flex:0 0 auto;text-align:center;padding:0 .8rem;align-self:center;
+}
+.j-start p,.j-end p{
+  font-family:'Dancing Script',cursive;font-size:1.25rem;color:var(--primary);
+  line-height:1.35;margin-top:.5rem;
+}
+.j-year{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:64px;height:64px;padding:0 .8rem;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;
+  font-family:'Outfit';font-weight:800;font-size:1.05rem;
+  box-shadow:0 8px 22px rgba(225,29,72,.3);border:3px solid #fff;
+}
+.j-item{flex:0 0 auto;position:relative;scroll-snap-align:center;display:flex;justify-content:center}
+.j-item:nth-child(odd) .polaroid{margin-top:2.2rem}
+.j-item:nth-child(even) .polaroid{margin-bottom:2.2rem}
+/* the path line + nodes */
+.journey-track::before{
+  content:'';position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;
+  background:repeating-linear-gradient(90deg, var(--border) 0 14px, transparent 14px 24px);
+  z-index:0;border-radius:2px;
+}
+.j-node{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:16px;height:16px;border-radius:50%;
+  background:#fff;border:4px solid var(--primary);
+  box-shadow:0 2px 8px rgba(225,29,72,.35);z-index:1;
+}
+/* keep polaroid styles working inside items */
+.j-item .polaroid{position:relative;z-index:2}
+/* hint + progress */
+.journey-hint{
+  display:flex;align-items:center;justify-content:center;gap:.8rem;
+  color:var(--mutedfg);font-size:.9rem;padding:0 1.5rem 1rem;
+}
+.jh-arrow{animation:nudge 1.8s ease-in-out infinite}
+.jh-arrow:last-of-type{animation-delay:.9s}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+.j-progress{
+  width:120px;height:6px;border-radius:99px;background:var(--border);
+  overflow:hidden;margin-left:.5rem;
+}
+.j-progress-bar{
+  height:100%;width:0%;border-radius:99px;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  transition:width .15s linear;
+}
+/* hand-written date under each photo */
+.polaroid .date{
+  display:block;text-align:right;font-family:'Dancing Script',cursive;
+  font-size:.95rem;color:#B08968;margin-top:.15rem;
+}
+/* corner photo-mount triangles (kraft paper corners) */
+.polaroid .corner{
+  position:absolute;width:34px;height:34px;z-index:2;pointer-events:none;
+  background:linear-gradient(135deg,#C4A77D 50%,transparent 50%);
+  opacity:.85;
+}
+.polaroid .corner.tl{top:-4px;left:-4px;transform:rotate(0deg);clip-path:polygon(0 0,100% 0,0 100%)}
+.polaroid .corner.br{bottom:-4px;right:-4px;transform:rotate(180deg);clip-path:polygon(0 0,100% 0,0 100%)}
+.polaroid{
+  background:linear-gradient(178deg,#FFFFFF 0%,#FFF9F5 100%);
+  border:1px solid var(--border);
+  border-radius:.7rem;padding:.8rem .8rem 1.1rem;
+  box-shadow:0 10px 30px rgba(136,19,55,.13), 0 2px 8px rgba(136,19,55,.08);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease,filter .3s ease;
+  cursor:zoom-in;
+  --tilt:-4.5deg; transform:rotate(var(--tilt)) translateZ(0);
+  width:250px;
+}
+.polaroid.featured{width:420px;max-width:78vw}
+.polaroid.featured .num{top:-14px;right:-10px}
+/* bigger, more varied tilts — real scrapbook feel */
+.j-item:nth-of-type(1) .polaroid{--tilt:-4deg}
+.j-item:nth-of-type(2) .polaroid{--tilt:3deg}
+.j-item:nth-of-type(3) .polaroid{--tilt:-2.5deg}
+.j-item:nth-of-type(4) .polaroid{--tilt:4.5deg}
+.j-item:nth-of-type(5) .polaroid{--tilt:-5deg}
+.j-item:nth-of-type(6) .polaroid{--tilt:2.5deg}
+.j-item:nth-of-type(7) .polaroid{--tilt:-3.5deg}
+.j-item:nth-of-type(8) .polaroid{--tilt:4deg}
+/* washi tape — 2 pieces, alternating colors per card */
+.polaroid::after{
+  content:'';position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(calc(var(--tilt) * -.8));
+  width:86px;height:26px;border-radius:2px;
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.25) 0 6px, transparent 6px 12px),
+    rgba(251,113,133,.55);
+  border-left:2px dashed rgba(255,255,255,.7);
+  border-right:2px dashed rgba(255,255,255,.7);
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  pointer-events:none;
+}
+.polaroid::before{
+  content:attr(data-tape2);
+  position:absolute;bottom:-9px;right:14%;transform:rotate(calc(var(--tilt) * -1.6));
+  width:60px;height:18px;border-radius:2px;font-size:0;
+  background:
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.22) 0 5px, transparent 5px 10px),
+    rgba(234,88,12,.42);
+  border-left:2px dashed rgba(255,255,255,.6);
+  border-right:2px dashed rgba(255,255,255,.6);
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  pointer-events:none;
+}
+/* hover: the photo "develops" — vintage → full color, like a polaroid developing */
+.polaroid img{
+  border-radius:.45rem;aspect-ratio:4/5;object-fit:cover;width:100%;
+  filter:sepia(.45) saturate(.72) contrast(1.04) brightness(1.02);
+  transition:filter .55s ease, transform .5s ease;
+}
+.polaroid.featured img{aspect-ratio:16/10}
+.polaroid:hover img, .polaroid:active img{filter:sepia(0) saturate(1.08) contrast(1);transform:scale(1.02)}
+/* sticker doodles on featured cards */
+.polaroid.featured .sticker{
+  position:absolute;font-size:2.4rem;z-index:2;pointer-events:none;
+  filter:drop-shadow(0 3px 6px rgba(225,29,72,.25));
+  animation:stickerWiggle 3.2s ease-in-out infinite;
+}
+@keyframes stickerWiggle{
+  0%,100%{transform:rotate(-8deg) scale(1)}
+  50%{transform:rotate(6deg) scale(1.12)}
+}
+.polaroid:hover{transform:rotate(0) translateY(-10px) scale(1.05);box-shadow:0 22px 50px rgba(136,19,55,.22);z-index:3}
+.polaroid figcaption{padding-top:.7rem;text-align:center;font-size:.95rem;color:var(--mutedfg)}
+.polaroid .num{
+  position:absolute;top:-14px;right:-10px;background:var(--primary);color:#fff;
+  font-family:'Outfit';font-weight:700;font-size:.9rem;
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 10px rgba(225,29,72,.35);
+  z-index:1;
+  border:2px solid #fff;
+}
+.polaroid{position:relative}
+
+/* section extras */
+.gallery-extra{text-align:center;margin-top:1rem}
+.gallery-extra .polaroid-label{
+  display:inline-block;background:var(--card);border:1px dashed var(--secondary);
+  border-radius:999px;padding:.5rem 1.4rem;font-size:.9rem;color:var(--mutedfg);
+}
+/* film strip counter */
+.gallery-hud{
+  text-align:center;margin-top:1.4rem;color:var(--mutedfg);font-size:.9rem;
+  display:flex;align-items:center;justify-content:center;gap:.7rem;
+}
+.gallery-hud .dots{display:flex;gap:.4rem}
+.gallery-hud .dot{
+  width:8px;height:8px;border-radius:50%;background:var(--border);
+  transition:all .3s ease;cursor:pointer;
+}
+.gallery-hud .dot:hover{transform:scale(1.3)}
+.gallery-hud .dot.active{background:var(--primary);transform:scale(1.25)}
+
+/* lightbox */
+.lightbox{
+  position:fixed;inset:0;background:rgba(136,19,55,.88);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;z-index:100;
+  padding:2rem;cursor:zoom-out;
+}
+.lightbox.open{display:flex;animation:lbIn .25s ease}
+@keyframes lbIn{from{opacity:0}to{opacity:1}}
+.lightbox img{max-width:88vw;max-height:78vh;border-radius:1rem;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.lightbox .cap{
+  position:absolute;bottom:2.2rem;left:50%;transform:translateX(-50%);
+  color:#fff;font-family:'Dancing Script',cursive;font-size:1.5rem;
+  background:rgba(225,29,72,.35);padding:.4rem 1.4rem;border-radius:999px;
+  max-width:88vw;white-space:normal;text-align:center;
+  overflow-wrap:break-word;word-break:break-word;line-height:1.35;
+}
+.lightbox .close{
+  position:absolute;top:1.2rem;right:1.4rem;color:#fff;font-size:2.2rem;
+  background:rgba(255,255,255,.15);border:none;border-radius:50%;
+  width:48px;height:48px;cursor:pointer;line-height:1;
+}
+.lightbox .nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  color:#fff;font-size:2.4rem;background:rgba(255,255,255,.14);
+  border:none;border-radius:50%;width:54px;height:54px;cursor:pointer;line-height:1;
+  transition:background .2s ease,transform .2s ease;
+  display:flex;align-items:center;justify-content:center;
+}
+.lightbox .nav:hover{background:rgba(255,255,255,.3);transform:translateY(-50%) scale(1.08)}
+.lightbox .prev{left:1.2rem}
+.lightbox .next{right:1.2rem}
+.lightbox .counter{
+  position:absolute;top:1.6rem;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,.85);font-family:'Outfit';font-weight:600;font-size:1rem;
+  background:rgba(255,255,255,.12);padding:.3rem 1.1rem;border-radius:999px;
+}
+.lightbox .swipe-hint{
+  position:absolute;bottom:5.6rem;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,.6);font-size:.8rem;letter-spacing:.1em;
+}
+
+/* ---------- video ---------- */
+.video-wrap{
+  position:relative;border-radius:1.5rem;overflow:hidden;
+  border:1px solid var(--border);box-shadow:0 14px 44px rgba(225,29,72,.12);
+  background:#000;
+}
+.video-wrap video{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+
+/* ---------- quiz ---------- */
+.quiz{background:var(--card);border:1px solid var(--border);border-radius:1.5rem;padding:2rem clamp(1.2rem,4vw,2.5rem);box-shadow:0 10px 36px rgba(225,29,72,.07)}
+.quiz h3{font-size:1.15rem;margin-bottom:1.2rem;text-align:center}
+.quiz .opts{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media (max-width:480px){.quiz .opts{grid-template-columns:1fr}}
+.quiz button{
+  font-family:'Work Sans';font-size:1rem;padding:.9rem 1rem;border-radius:.9rem;
+  border:2px solid var(--border);background:#fff;color:var(--fg);cursor:pointer;
+  transition:all .2s ease;
+}
+.quiz button:hover{border-color:var(--secondary);transform:translateY(-2px)}
+.quiz button.right{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border-color:transparent}
+.quiz button.wrong{opacity:.5;border-color:var(--border)}
+.quiz .result{text-align:center;margin-top:1.2rem;font-family:'Dancing Script';font-size:1.5rem;color:var(--primary);min-height:2.2rem}
+
+/* ---------- 25 reasons ---------- */
+.reasons{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:.9rem;counter-reset:r}
+.reason{
+  background:var(--card);border:1px solid var(--border);border-radius:1rem;
+  padding:1rem 1.2rem 1rem 3.2rem;position:relative;font-size:.98rem;
+  box-shadow:0 4px 16px rgba(225,29,72,.05);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.reason:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(225,29,72,.11)}
+.reason::before{
+  counter-increment:r;content:counter(r);
+  position:absolute;left:1rem;top:50%;transform:translateY(-50%);
+  font-family:'Outfit';font-weight:800;color:var(--primary);
+  font-size:1.15rem;
+}
+
+/* ---------- countdown-ish wish ---------- */
+.wish{
+  text-align:center;background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:var(--on-primary);border-radius:1.8rem;
+  padding:clamp(2.5rem,7vw,4.5rem) 1.5rem;
+  box-shadow:0 16px 50px rgba(225,29,72,.25);
+  position:relative;overflow:hidden;
+}
+.wish h2{font-size:clamp(2rem,6vw,3.4rem);font-weight:800;line-height:1.15;margin-bottom:1rem}
+.wish p{opacity:.95;max-width:30rem;margin:0 auto 2rem;font-weight:300}
+.wish .big{font-size:clamp(2.6rem,9vw,4.5rem);margin-bottom:.5rem}
+.wish .btn{
+  display:inline-flex;align-items:center;gap:.6rem;
+  background:#fff;color:var(--primary);font-family:'Outfit';font-weight:700;
+  font-size:1.1rem;border:none;border-radius:999px;
+  padding:1rem 2.2rem;cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.wish .btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 12px 32px rgba(0,0,0,.25)}
+.wish .btn:active{transform:scale(.97)}
+.wish .hint{font-size:.85rem;opacity:.75;margin-top:1rem}
+
+footer{text-align:center;padding:3rem 1.5rem 4rem;color:var(--mutedfg);font-size:.9rem}
+footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:600;font-size:1.6rem}
+
+/* music btn */
+.music-btn{
+  position:fixed;bottom:1.2rem;right:1.2rem;z-index:70;
+  width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--card);color:var(--primary);
+  box-shadow:0 8px 24px rgba(225,29,72,.2);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s ease;
+}
+.music-btn:hover{transform:scale(1.08)}
+.music-btn.playing{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 8px 24px rgba(225,29,72,.2)}50%{box-shadow:0 8px 34px rgba(225,29,72,.45)}}
+.music-note{
+  position:fixed;bottom:1.2rem;right:4.6rem;z-index:70;pointer-events:none;
+  font-size:1.1rem;opacity:0;transition:opacity .4s ease,transform 2.5s ease;
+}
+.music-note.show{opacity:.9;animation:floatNote 2.5s ease forwards}
+@keyframes floatNote{
+  0%{opacity:0;transform:translateY(0) rotate(0)}
+  20%{opacity:.9}
+  100%{opacity:0;transform:translateY(-70px) rotate(18deg)}
+}
+</style>
+</head>
+<body>
+
+<div class="hearts" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-photo-frame">
+    <div class="inner"><img src="media/foto8.jpg" alt="Kita berdua"></div>
+  </div>
+  <span class="badge">✦ 25 Tahun ✦</span>
+  <h1>Selamat Ulang Tahun<br>yang ke-<span class="age">25</span>, Sayang</h1>
+  <p class="hand-line">sebuah hadiah kecil, dari aku untukmu</p>
+  <p class="sub">Sebuah halaman kecil di internet, kubuat khusus untukmu —
+  karena 25 tahun keberadaanmu adalah hal yang layak dirayakan sebesar ini.
+  Scroll pelan-pelan, ada beberapa kejutan di dalamnya.</p>
+  <div class="scroll-cue" aria-hidden="true">▼ pelan-pelan scroll ke bawah ya</div>
+</header>
+
+<!-- LETTER -->
+<section aria-labelledby="surat">
+  <p class="section-label reveal">Surat untukmu</p>
+  <h2 class="section-title reveal" id="surat">Sepatah dua patah kata</h2>
+  <p class="section-sub reveal">Ditulis pelan-pelan, bukan asal tempel.</p>
+  <div class="letter reveal">
+    <p class="salut">Hai sayang,</p>
+    <p>Hari ini kamu resmi 25. Dan aku cuma mau bilang: beruntung sekali aku yang ikut merayakannya.</p>
+    <p>25 tahun berarti 25 tahun kamu tumbuh jadi orang yang hangat, kuat, dan bikin sekitarmu lebih nyaman.
+    Aku lihat sendiri bagaimana kamu memperlakukan orang-orang di sekitarmu — dan setiap kali itu terjadi,
+    aku cuma bisa senyum bangga.</p>
+    <p>Terima kasih untuk semua momen kecil yang ternyata jadi kenangan besar:
+    jalan-jalan tanpa rencana, makan di tempat acak, duduk berdua nunggu senja.
+    Semua itu terasa lengkap karena ada kamu di sampingnya.</p>
+    <p>Di umur yang baru ini, kudoakan hal-hal baik menemukanmu lebih cepat dari yang kamu kira.
+    Dan untuk bagian perjalanan sisanya… aku masih minta ikut, ya.</p>
+    <p class="sign">— dari seseorang yang sayang kamu</p>
+  </div>
+</section>
+
+<!-- GALLERY : horizontal scroll journey -->
+<section aria-labelledby="kenangan" class="gal-sec">
+  <p class="section-label reveal">Galeri</p>
+  <h2 class="section-title reveal" id="kenangan">Perjalanan Kita, Momen demi Momen</h2>
+  <p class="section-sub reveal">Geser ke samping — atau scroll biasa, galerinya ikut berjalan. Delapan momen, satu garis waktu. Klik fotonya untuk memperbesar.</p>
+  <div class="gallery-extra reveal"><span class="polaroid-label">💡 Sentuh / arahkan kursor ke foto — lihat "polaroid"-nya berkembang jadi warna penuh</span></div>
+  <div class="journey reveal">
+    <div class="journey-track" id="journey-track">
+      <div class="j-start">
+        <span class="j-year">Awal</span>
+        <p>Semua<br>berawal<br>dari sini ✨</p>
+      </div>
+
+      <div class="j-item" data-i="0">
+        <span class="j-node" aria-hidden="true"></span>
+        <figure class="polaroid featured" data-tape2="" data-sticker="✨"><span class="sticker" style="top:-16px;right:-8px">✨</span><span class="corner tl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span><span class="num">1</span>
+          <img src="media/foto8.jpg" alt="Dinner romantis, mencium tangan di meja berlampu elegan" loading="lazy">
+          <figcaption>Dinner romantis, makan malam favorit 🌹</figcaption><span class="date" aria-hidden="true">— 2023.08 —</span>
+        </figure>
+      </div>
+      <div class="j-item" data-i="1">
+        <span class="j-node" aria-hidden="true"></span>
+        <figure class="polaroid" data-tape2=""><span class="corner tl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span><span class="num">2</span>
+          <img src="media/foto1.jpg" alt="Berdua di kafe, duduk santai di meja putih" loading="lazy">
+          <figcaption>Santai berdua, bahagia sederhana ☕</figcaption><span class="date" aria-hidden="true">— 2023.12 —</span>
+        </figure>
+      </div>
+      <div class="j-item" data-i="2">
+        <span class="j-node" aria-hidden="true"></span>
+        <figure class="polaroid" data-tape2=""><span class="corner tl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span><span class="num">3</span>
+          <img src="media/foto2.jpg" alt="Selfie berdua di jalanan kota sore hari" loading="lazy">
+          <figcaption>Jalan tanpa rencana, tetap seru 🚶</figcaption><span class="date" aria-hidden="true">— 2024.02 —</span>
+        </figure>
+      </div>
+      <div class="j-item" data-i="3">
+        <span class="j-node" aria-hidden="true"></span>
+        <figure class="polaroid" data-tape2=""><span class="corner tl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span><span class="num">4</span>
+          <img src="media/foto3.jpg" alt="Berdua di stadion saat konser" loading="lazy">
+          <figcaption>Malam konser, suara dan cahaya 🎶</figcaption><span class="date" aria-hidden="true">— 2024.06 —</span>
+        </figure>
+      </div>
+      <div class="j-item" data-i="4">
+        <span class="j-node" aria-hidden="true"></span>
+        <figure class="polaroid" data-tape2=""><span class="corner tl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span><span class="num">5</span>
+          <img src="media/foto4.jpg" alt="Duduk berdua memandang senja di tepi laut" loading="lazy">
+          <figcaption>Duduk berdua nunggu senja 🌅</figcaption><span class="date" aria-hidden="true">— 2024.09 —</span>
+        </figure>
+      </div>
+      <div class="j-item" data-i="5">
+        <span class="j-node" aria-hidden="true"></span>
+        <figure class="polaroid featured" data-tape2="" data-sticker="💗"><span class="sticker" style="top:-16px;left:-8px">💗</span><span class="corner tl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span><span class="num">6</span>
+          <img src="media/foto5.jpg" alt="Berdua di Candi Prambanan, berfoto di depan candi batu" loading="lazy">
+          <figcaption>Bermain ke masa lalu, di Candi Prambanan 🏛️</figcaption><span class="date" aria-hidden="true">— 2024.12 —</span>
+        </figure>
+      </div>
+      <div class="j-item" data-i="6">
+        <span class="j-node" aria-hidden="true"></span>
+        <figure class="polaroid" data-tape2=""><span class="corner tl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span><span class="num">7</span>
+          <img src="media/foto6.jpg" alt="Selfie berdua di bawah pohon pinus, langit biru" loading="lazy">
+          <figcaption>Bersama di bawah pohon-pohon, udara segar 🌲</figcaption><span class="date" aria-hidden="true">— 2025.03 —</span>
+        </figure>
+      </div>
+      <div class="j-item" data-i="7">
+        <span class="j-node" aria-hidden="true"></span>
+        <figure class="polaroid" data-tape2=""><span class="corner tl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span><span class="num">8</span>
+          <img src="media/foto7.jpg" alt="Perayaan ulang tahun dengan backdrop warna-warni, memegang kotak hadiah" loading="lazy">
+          <figcaption>Perayaanmu yang dulu — tahun ini lebih meriah lagi 🎁</figcaption><span class="date" aria-hidden="true">— 2025.06 —</span>
+        </figure>
+      </div>
+
+      <div class="j-end">
+        <span class="j-year">25</span>
+        <p>…dan<br>masih<br>berlanjut 💗</p>
+      </div>
+    </div>
+  </div>
+  <div class="journey-hint reveal" aria-hidden="true">
+    <span class="jh-arrow">←</span>
+    <span>geser untuk menjelajah</span>
+    <span class="jh-arrow">→</span>
+    <div class="j-progress"><div class="j-progress-bar" id="j-progress-bar"></div></div>
+  </div>
+</section>
+
+<!-- VIDEO -->
+<section aria-labelledby="video">
+  <p class="section-label reveal">Sebuah momen bergerak</p>
+  <h2 class="section-title reveal" id="video">Dan Ini, dalam Video</h2>
+  <p class="section-sub reveal">Karena beberapa kenangan paling baik diingat dengan menekan play.</p>
+  <div class="video-wrap reveal">
+    <video controls preload="metadata" playsinline poster="media/foto4.jpg">
+      <source src="media/video.mp4" type="video/mp4">
+      Browser kamu belum mendukung video HTML. Tapi tenang, momennya tetap tersimpan di hati. 💗
+    </video>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section aria-labelledby="kuis">
+  <p class="section-label reveal">Kejutan kecil</p>
+  <h2 class="section-title reveal" id="kuis">Seberapa Kenal Kamu Sama Aku? 😄</h2>
+  <p class="section-sub reveal">Satu pertanyaan iseng. Jawab yang mana pun, tetap aku sayang kok.</p>
+  <div class="quiz reveal">
+    <h3>Menurut kamu, apa hal pertama yang aku perhatikan waktu pertama ketemu?</h3>
+    <div class="opts" id="quiz-opts">
+      <button data-a="0">Senyummu</button>
+      <button data-a="1">Matamu</button>
+      <button data-a="2">Caramu bicara</button>
+      <button data-a="3">Semua sekaligus (dan aku bingung mau lihat yang mana)</button>
+    </div>
+    <div class="result" id="quiz-result" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- 25 REASONS -->
+<section aria-labelledby="alasan">
+  <p class="section-label reveal">Kejutan kedua</p>
+  <h2 class="section-title reveal" id="alasan">25 Alasan Aku Sayang Kamu</h2>
+  <p class="section-sub reveal">Satu untuk setiap tahunnya. Ini baru sebagian — sisanya kubilang langsung.</p>
+  <div class="reasons reveal">
+    <div class="reason">Caramu tersenyum waktu bangun pagi</div>
+    <div class="reason">Sabarmu menghadapiku yang suka begadang</div>
+    <div class="reason">Tawamu yang paling berisik di ruangan</div>
+    <div class="reason">Caramu peduli pada orang asing sekalipun</div>
+    <div class="reason">Foto-fotomu yang selalu bikin galeri HP-ku penuh</div>
+    <div class="reason">Keberanianmu mencoba hal baru</div>
+    <div class="reason">Caramu memeluk, entah kenapa selalu pas</div>
+    <div class="reason">Rekomendasi makananmu yang hampir selalu benar</div>
+    <div class="reason">Caramu marah — serius tapi tetap menggemaskan</div>
+    <div class="reason">Hati yang tulus di balik semuanya</div>
+    <div class="reason">Suaramu di telepon sebelum tidur</div>
+    <div class="reason">Caramu memaklumi kekuranganku</div>
+    <div class="reason">Rencana-rencana random yang selalu jadi</div>
+    <div class="reason">Caramu excited cerita hal kecil</div>
+    <div class="reason">Naluri berkata jujur meski tidak enak</div>
+    <div class="reason">Doamu untuk orang-orang tersayang</div>
+    <div class="reason">Caramu menari waktu lagu favoritmu bunyi</div>
+    <div class="reason">Kesabaranmu menghadapi hari yang berat</div>
+    <div class="reason">Caramu percaya padaku lebih dari aku percaya diri</div>
+    <div class="reason">Selera humor kita yang nyambung anehnya</div>
+    <div class="reason">Caramu memilih outfit — selalu pas</div>
+    <div class="reason">Langkah kakimu yang santai</div>
+    <div class="reason">Kelembutanmu pada hewan</div>
+    <div class="reason">Caramu bilang "aku juga sayang kamu"</div>
+    <div class="reason">Dan… simply, karena kamu jadinya kamu 💗</div>
+  </div>
+</section>
+
+<!-- WISH -->
+<section aria-labelledby="doa" style="padding-top:2rem">
+  <div class="wish reveal">
+    <div class="big" aria-hidden="true">🎂</div>
+    <h2 id="doa">Selamat 25, Sayangku</h2>
+    <p>Semoga tahun ke-25 ini lembut sama kamu, dan semua rencana baikmu menemukan jalannya.
+    Aku di sini — ikut merayakan, ikut mendukung, ikut sayang.</p>
+    <button class="btn" id="confetti-btn">
+      🎉 Tekan Aku Kalau Kamu Senang
+    </button>
+    <p class="hint">Tekan sebanyak yang kamu mau — confetti tak akan habis, sama seperti alasan aku sayang kamu.</p>
+  </div>
+</section>
+
+<footer>
+  <p class="h">Dibuat dengan sepenuh hati, untukmu.</p>
+  <p>— 2026 —</p>
+</footer>
+
+<button class="music-btn" id="music-btn" aria-label="Putar musik latar" title="Musik latar">
+  <span id="music-icon" aria-hidden="true">🎵</span>
+</button>
+<span class="music-note" id="music-note" aria-hidden="true">🎶</span>
+<audio id="bg-music" src="media/music.mp3" loop preload="auto"></audio>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Foto diperbesar">
+  <span class="counter" id="lb-counter"></span>
+  <button class="close" id="lb-close" aria-label="Tutup">×</button>
+  <button class="nav prev" id="lb-prev" aria-label="Foto sebelumnya">‹</button>
+  <button class="nav next" id="lb-next" aria-label="Foto berikutnya">›</button>
+  <img id="lb-img" src="" alt="">
+  <div class="cap" id="lb-cap"></div>
+  <div class="swipe-hint" id="lb-hint" aria-hidden="true">← geser / panah untuk pindah →</div>
+</div>
+
+<script>
+// floating hearts
+(function(){
+  const wrap = document.querySelector('.hearts');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !wrap) return;
+  const glyphs = ['💗','🩷','❤️','✨','🌷'];
+  for (let i=0;i<18;i++){
+    const s = document.createElement('span');
+    s.className='heart';
+    s.textContent = glyphs[i%glyphs.length];
+    s.style.left = Math.random()*100+'vw';
+    s.style.animationDuration = (9+Math.random()*10)+'s';
+    s.style.animationDelay = (Math.random()*10)+'s';
+    s.style.fontSize = (0.8+Math.random()*1.4)+'rem';
+    wrap.appendChild(s);
+  }
+})();
+
+// reveal on scroll
+(function(){
+  const els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(e=>e.classList.add('in')); return; }
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
+  },{threshold:.14});
+  els.forEach(e=>io.observe(e));
+})();
+
+// lightbox with prev/next, keyboard, swipe, dots sync
+(function(){
+  const lb=document.getElementById('lightbox'), img=document.getElementById('lb-img'),
+        cap=document.getElementById('lb-cap'), close=document.getElementById('lb-close'),
+        prev=document.getElementById('lb-prev'), next=document.getElementById('lb-next'),
+        counter=document.getElementById('lb-counter'), hint=document.getElementById('lb-hint'),
+        dotsWrap=document.getElementById('gallery-dots');
+  const cards=[...document.querySelectorAll('.j-item .polaroid')];
+  const items=[...document.querySelectorAll('.j-item')];
+  const pbar=document.getElementById('j-progress-bar');
+  let idx=0, hintShown=false;
+
+  function syncDots(){
+    if(pbar && items.length){
+      const tr=document.getElementById('journey-track');
+      const max=tr.scrollWidth - tr.clientWidth;
+      pbar.style.width = (max>0 ? (tr.scrollLeft/max*100) : 100)+'%';
+    }
+  }
+  function scrollToCard(i){
+    items[Math.min(i, items.length-1)].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  }
+  // progress bar follows horizontal scroll
+  const tr=document.getElementById('journey-track');
+  tr.addEventListener('scroll', syncDots, {passive:true});
+  syncDots();
+  // drag-to-scroll with mouse
+  let down=false,sx=0,sl=0,moved=false;
+  tr.addEventListener('mousedown',e=>{down=true;moved=false;sx=e.pageX;sl=tr.scrollLeft;tr.classList.add('dragging')});
+  addEventListener('mousemove',e=>{if(!down)return;const dx=e.pageX-sx;if(Math.abs(dx)>5)moved=true;tr.scrollLeft=sl-dx});
+  addEventListener('mouseup',()=>{down=false;tr.classList.remove('dragging')});
+  // click on polaroid: if dragged, don't open
+  cards.forEach((p,i)=>p.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();}},true));
+  function show(i){
+    idx=(i+cards.length)%cards.length;
+    const p=cards[idx];
+    img.src=p.querySelector('img').src;
+    cap.textContent=p.querySelector('figcaption').textContent;
+    counter.textContent=(idx+1)+' / '+cards.length;
+    syncDots();
+  }
+  function open(i){ show(i); lb.classList.add('open'); close.focus();
+    if(!hintShown){ hintShown=true; setTimeout(()=>hint.style.display='none',4000); } }
+  cards.forEach((p,i)=>p.addEventListener('click',()=>open(i)));
+  const closeLb=()=>lb.classList.remove('open');
+  lb.addEventListener('click',e=>{ if(e.target===lb||e.target===close) closeLb(); });
+  prev.addEventListener('click',e=>{ e.stopPropagation(); show(idx-1); });
+  next.addEventListener('click',e=>{ e.stopPropagation(); show(idx+1); });
+  document.addEventListener('keydown',e=>{
+    if(!lb.classList.contains('open')) return;
+    if(e.key==='Escape') closeLb();
+    if(e.key==='ArrowLeft') show(idx-1);
+    if(e.key==='ArrowRight') show(idx+1);
+  });
+  // touch swipe
+  let tx=0;
+  lb.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+  lb.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>50) show(idx+(dx<0?1:-1));
+  },{passive:true});
+})();
+
+// quiz
+(function(){
+  const btns=document.querySelectorAll('#quiz-opts button'), res=document.getElementById('quiz-result');
+  const answers=[
+    'Betul! Senyummu selalu jadi hal pertama yang kucari 🥰',
+    'Benar sekali! Matamu nggak bisa bohong 🥺',
+    'Tepat! Caramu bicara bikin aku bisa dengar berjam-jam 💬',
+    'Jawaban terbaik! Semuanya sekaligus — makanya aku kejadian cinta 😄💗'
+  ];
+  let done=false;
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    if(done) return; done=true;
+    btns.forEach(x=>{ if(x!==b) x.classList.add('wrong'); });
+    b.classList.add('right');
+    res.textContent = answers[+b.dataset.a];
+  }));
+})();
+
+// confetti
+(function(){
+  const canvas=document.getElementById('confetti'), ctx=canvas.getContext('2d');
+  let pieces=[], raf=null;
+  function resize(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+  resize(); addEventListener('resize',resize);
+  const colors=['#E11D48','#FB7185','#EA580C','#F472B6','#FDE68A','#FFFFFF'];
+  function burst(n){
+    for(let i=0;i<n;i++){
+      pieces.push({
+        x:innerWidth/2+(Math.random()-.5)*140,
+        y:canvas.getBoundingClientRect().top+innerHeight*0.55,
+        vx:(Math.random()-.5)*13, vy:-(6+Math.random()*9),
+        g:.22+Math.random()*.12, s:5+Math.random()*6,
+        c:colors[Math.floor(Math.random()*colors.length)],
+        rot:Math.random()*Math.PI, vr:(Math.random()-.5)*.3, life:1
+      });
+    }
+    if(!raf) tick();
+  }
+  function tick(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces=pieces.filter(p=>p.life>0 && p.y<canvas.height+40);
+    pieces.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy+=p.g; p.rot+=p.vr; p.life-=.004;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.globalAlpha=Math.max(p.life,0);
+      ctx.fillStyle=p.c;
+      ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.62);
+      ctx.restore();
+    });
+    raf = pieces.length ? requestAnimationFrame(tick) : null;
+    if(!pieces.length) ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  document.getElementById('confetti-btn').addEventListener('click',()=>burst(130));
+  // kejutan: confetti kecil saat halaman pertama dibuka
+  setTimeout(()=>{ if(!matchMedia('(prefers-reduced-motion: reduce)').matches) burst(70); }, 1200);
+})();
+
+// background music (autoplay muted-start policy: try autoplay, fall back to button)
+(function(){
+  const audio=document.getElementById('bg-music'), btn=document.getElementById('music-btn'),
+        icon=document.getElementById('music-icon'), note=document.getElementById('music-note');
+  let playing=false;
+  function setIcon(on){
+    playing=on;
+    icon.textContent = on ? '⏸' : '🎵';
+    btn.classList.toggle('playing', on);
+    btn.setAttribute('aria-label', on ? 'Hentikan musik latar' : 'Putar musik latar');
+  }
+  function floatNote(){
+    note.classList.remove('show'); void note.offsetWidth; note.classList.add('show');
+  }
+  function start(){
+    audio.play().then(()=>{ setIcon(true); floatNote(); })
+      .catch(()=>{ setIcon(false); }); // diblokir autoplay → tunggu tombol
+  }
+  btn.addEventListener('click',()=>{
+    if(playing){ audio.pause(); setIcon(false); }
+    else start();
+  });
+  // coba autoplay langsung (kebanyakan browser blokir; kalau lolos, langsung manis)
+  start();
+})();
+</script>
+</body>
+</html>
