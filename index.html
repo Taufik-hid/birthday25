@@ -762,7 +762,7 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
         btn=document.getElementById('micBtn'),
         bar=document.getElementById('micbar'),
         fallback=document.getElementById('introFallback');
-  const BLOW_THRESHOLD=0.92; // volume RMS untuk mematikan api (0-1), lebih tinggi = lebih sulit
+  const BLOW_THRESHOLD=0.72; // volume RMS untuk mematikan api (0-1), lebih tinggi = lebih sulit
   const BLOW_HOLD_MS=700;    // harus di atas threshold selama ini (anti spike/noise)
   let blown=false, blowStart=0;
   let musicStarted=false;
