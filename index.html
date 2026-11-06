@@ -825,20 +825,31 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
   });
 
   function extinguish(stream,ctx){
-    // api padam → glow meredup pelan → transisi halus ke halaman utama
+    // api padam → seluruh layar gelap mengikuti cahaya yang meredup → fade in ke halaman utama
     const glow=document.querySelector('.candle-glow');
-    flame.style.transition='opacity 1s ease, transform 1s ease';
+    const wrap=document.querySelector('.candle-wrap');
+    // 1) api meredup + seluruh layar perlahan gelap (1.6s)
+    flame.style.transition='opacity 1.6s ease, transform 1.6s ease';
     flame.style.opacity='0';
     flame.style.transform='translateX(-50%) scale(.3,.06)';
-    if(glow){ glow.style.transition='opacity 1.2s ease'; glow.style.opacity='0'; }
-    intro.style.transition='background 1.4s ease';
+    if(glow){ glow.style.transition='opacity 1.8s ease'; glow.style.opacity='0'; }
+    if(wrap){ wrap.style.transition='filter 1.8s ease, opacity 1.8s ease'; wrap.style.filter='none'; }
+    intro.style.transition='background 1.8s ease';
+    intro.style.background='#000';
+    // teks juga memudar mengikuti gelap
+    intro.querySelectorAll('.intro-title,.intro-fallback,.mic-level').forEach(el=>{
+      el.style.transition='opacity 1.5s ease'; el.style.opacity='0';
+    });
     stream.getTracks().forEach(t=>t.stop());
     ctx.close();
+    // 2) layar hitam sesaat (beri jeda napas)
     setTimeout(()=>{
-      window.__startBirthdayMusic(); // musik baru mulai setelah lilin padam
+      // 3) fade in perlahan membuka halaman utama + musik mulai
+      window.__startBirthdayMusic();
+      intro.style.transition='opacity 2.2s ease, visibility 2.2s ease';
       intro.classList.add('hidden');
-      setTimeout(()=>intro.remove(), 1800);
-    }, 1000);
+      setTimeout(()=>intro.remove(), 2400);
+    }, 2200);
   }
 
   function enter(){
