@@ -455,7 +455,7 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
 #candle-intro.hidden{opacity:0;visibility:hidden;pointer-events:none}
 .candle-wrap{position:relative;filter:drop-shadow(0 0 40px rgba(255,160,40,.25))}
 .flame{
-  width:26px;height:44px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+  width:28px;height:64px;border-radius:50% 50% 50% 50%/62% 62% 38% 38%;
   background:radial-gradient(circle at 50% 75%,#fff7cc 0%,#ffd23e 40%,#ff8c1a 70%,#e8590c 100%);
   position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
   transform-origin:50% 100%;
@@ -762,8 +762,18 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
         btn=document.getElementById('micBtn'),
         bar=document.getElementById('micbar'),
         fallback=document.getElementById('introFallback');
-  const BLOW_THRESHOLD=0.55; // volume RMS untuk mematikan api (0-1)
-  let blown=false;
+  const BLOW_THRESHOLD=0.92; // volume RMS untuk mematikan api (0-1), lebih tinggi = lebih sulit
+  const BLOW_HOLD_MS=700;    // harus di atas threshold selama ini (anti spike/noise)
+  let blown=false, blowStart=0;
+  let musicStarted=false;
+
+  window.__startBirthdayMusic = function(){
+    if(musicStarted) return;
+    musicStarted=true;
+    const audio=document.getElementById('bg-music');
+    const btn=document.getElementById('music-btn'), icon=document.getElementById('music-icon');
+    audio.play().then(()=>{ icon.textContent='⏸'; btn.classList.add('playing'); }).catch(()=>{});
+  };
 
   btn.addEventListener('click', async ()=>{
     try{
@@ -782,18 +792,26 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
         let sum=0;
         for(let i=0;i<buf.length;i++) sum+=buf[i]*buf[i];
         const rms=Math.sqrt(sum/buf.length);
-        const level=Math.min(1, rms*4);
+        const level=Math.min(1, rms*3.2);
         bar.style.width=(level*100)+'%';
 
         if(!blown){
-          // goyang api sesuai volume
-          const sway=level*22;
+          const now=performance.now();
+          // goyang api sesuai volume + flicker acak tetap jalan
+          const sway=level*30 + Math.sin(now/90)*2;
+          const wob=Math.sin(now/130)*3*(1+level);
           flame.style.animation='none';
-          flame.style.transform=`translateX(-50%) rotate(${(Math.random()*2-1)*sway}deg) scale(${1-level*0.25},${1-level*0.15})`;
+          flame.style.transform=`translateX(-50%) rotate(${wob+(Math.random()*2-1)*sway}deg) scale(${1-level*0.2},${1+level*0.08})`;
+          // harus kencang & stabil selama BLOW_HOLD_MS untuk padam
           if(level>BLOW_THRESHOLD){
-            blown=true;
-            extinguish(stream,ctx);
-            return;
+            if(!blowStart) blowStart=now;
+            if(now-blowStart>=BLOW_HOLD_MS){
+              blown=true;
+              extinguish(stream,ctx);
+              return;
+            }
+          }else{
+            blowStart=0;
           }
         }
         requestAnimationFrame(listen);
@@ -802,17 +820,25 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
       fallback.textContent='Microphone tidak tersedia — tap di sini untuk masuk tanpa meniup lilin 🎉';
       fallback.style.cursor='pointer';
       btn.style.display='none';
-      fallback.addEventListener('click', enter, {once:true});
+      fallback.addEventListener('click', ()=>{ enter(); window.__startBirthdayMusic(); }, {once:true});
     }
   });
 
   function extinguish(stream,ctx){
-    flame.style.transition='opacity .5s ease, transform .5s ease';
+    // api padam → glow meredup pelan → transisi halus ke halaman utama
+    const glow=document.querySelector('.candle-glow');
+    flame.style.transition='opacity 1s ease, transform 1s ease';
     flame.style.opacity='0';
-    flame.style.transform='translateX(-50%) scale(.2,.05)';
+    flame.style.transform='translateX(-50%) scale(.3,.06)';
+    if(glow){ glow.style.transition='opacity 1.2s ease'; glow.style.opacity='0'; }
+    intro.style.transition='background 1.4s ease';
     stream.getTracks().forEach(t=>t.stop());
     ctx.close();
-    setTimeout(enter, 900);
+    setTimeout(()=>{
+      window.__startBirthdayMusic(); // musik baru mulai setelah lilin padam
+      intro.classList.add('hidden');
+      setTimeout(()=>intro.remove(), 1800);
+    }, 1000);
   }
 
   function enter(){
@@ -973,8 +999,7 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
     if(playing){ audio.pause(); setIcon(false); }
     else start();
   });
-  // coba autoplay langsung (kebanyakan browser blokir; kalau lolos, langsung manis)
-  start();
+  // Autoplay dinonaktifkan: musik mulai otomatis SETELAH lilin berhasil ditiup (window.__startBirthdayMusic)
 })();
 </script>
 </body>
