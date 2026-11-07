@@ -1001,16 +1001,14 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
   setTimeout(()=>{ if(!matchMedia('(prefers-reduced-motion: reduce)').matches) burst(70); }, 1200);
 })();
 
-// hero photo spin — JS-driven agar tetap jalan walau OS aktifkan "reduce motion"
+// hero photo spin — JS-driven, foto ikut berputar penuh (jelas terlihat di semua layar)
 (function(){
   const frame=document.querySelector('.hero-photo-frame');
   if(!frame) return;
-  const inner=frame.querySelector('.inner');
   let a=0;
   (function rotate(){
-    a=(a+0.45)%360;          // ~14 detik per putaran
+    a=(a+0.5)%360;           // 12 detik per putaran
     frame.style.transform=`rotate(${a}deg)`;
-    if(inner) inner.style.transform=`rotate(${-a}deg)`;
     requestAnimationFrame(rotate);
   })();
 })();
