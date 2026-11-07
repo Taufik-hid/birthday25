@@ -57,14 +57,13 @@ img{max-width:100%;display:block}
   margin-bottom:2rem;border-radius:50%;
   padding:8px;
   background:conic-gradient(from 0deg,var(--primary),var(--accent),var(--secondary),var(--primary));
-  animation:spin 14s linear infinite, fadeIn .9s ease both;
+  animation:fadeIn .9s ease both;
   box-shadow:0 18px 60px rgba(225,29,72,.28);
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .hero-photo-frame .inner{
   border-radius:50%;overflow:hidden;width:100%;height:100%;
-  animation:spin 14s linear infinite reverse;
   border:6px solid #fff;
 }
 .hero-photo-frame img{width:100%;height:100%;object-fit:cover}
@@ -1000,6 +999,20 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
   document.getElementById('confetti-btn').addEventListener('click',()=>burst(130));
   // kejutan: confetti kecil saat halaman pertama dibuka
   setTimeout(()=>{ if(!matchMedia('(prefers-reduced-motion: reduce)').matches) burst(70); }, 1200);
+})();
+
+// hero photo spin — JS-driven agar tetap jalan walau OS aktifkan "reduce motion"
+(function(){
+  const frame=document.querySelector('.hero-photo-frame');
+  if(!frame) return;
+  const inner=frame.querySelector('.inner');
+  let a=0;
+  (function rotate(){
+    a=(a+0.45)%360;          // ~14 detik per putaran
+    frame.style.transform=`rotate(${a}deg)`;
+    if(inner) inner.style.transform=`rotate(${-a}deg)`;
+    requestAnimationFrame(rotate);
+  })();
 })();
 
 // background music (autoplay muted-start policy: try autoplay, fall back to button)
