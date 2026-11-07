@@ -502,8 +502,8 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
 </head>
 <body>
 
-<!-- CANDLE INTRO -->
-<div id="candle-intro">
+<!-- CANDLE INTRO dinonaktifkan -->
+<div id="candle-intro" style="display:none">
   <div class="candle-wrap">
     <div class="candle-glow"></div>
     <div class="flame" id="flame"></div>
@@ -1029,7 +1029,8 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
     if(playing){ audio.pause(); setIcon(false); }
     else start();
   });
-  // Autoplay dinonaktifkan: musik mulai otomatis SETELAH lilin berhasil ditiup (window.__startBirthdayMusic)
+  // coba autoplay langsung (intro lilin dinonaktifkan); kalau diblokir, pakai tombol
+  start();
 })();
 </script>
 </body>
