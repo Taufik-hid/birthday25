@@ -18,7 +18,12 @@
 .cs-vignette{position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.75) 100%)}
 .cs-roll{position:absolute;left:50%;transform:translateX(-50%);width:min(680px,92vw);
-  text-align:center;will-change:top;top:100vh;animation:csScrollUp linear forwards;animation-duration:60s}
+  text-align:center;will-change:top;top:100vh}
+/* TANPA animasi di base rule — animasi HANYA dimulai lewat class cs-rolling di overlay,
+   setelah video selesai + preload foto tuntas + --cs-end & duration di-set oleh JS.
+   (Dulu: animation langsung di .cs-roll → animasi 60s default berjalan sejak overlay
+   dibuat, sehingga saat video selesai animasi sudah selesai/hampir selesai → foto diam.) */
+.cs-rolling .cs-roll{animation:csScrollUp linear forwards}
 /* Jarak animasi DIHITUNG via JS dari scrollHeight aktual (set CSS var --cs-end)
    — bukan -260% statis yang salah untuk konten panjang/pendek. Default aman: */
 @keyframes csScrollUp{from{top:100vh}to{top:var(--cs-end,-260%)}}

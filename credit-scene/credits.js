@@ -269,15 +269,43 @@
     }
     await preloadAll();
 
-    // durasi roll diikat ke total (CSS transition)
+    // durasi & jarak dulu, BARU class cs-rolling → animasi mulai dari 0 dengan nilai final
     roll.style.animationDuration = (t.total - t.closing) + "ms";
     // jarak animasi dari tinggi konten AKTUAL — dihitung SETELAH preload agar
     // scrollHeight sudah final (foto punya aspect-ratio tetap, jadi aman)
     roll.style.setProperty("--cs-end", "-" + (window.innerHeight + roll.scrollHeight) + "px");
+    // sinkronkan timer JS dengan durasi CSS: mulai dari sini
+    const rollDur = t.total - t.closing;
+    const rollStart = Date.now();
     ov.classList.add("cs-rolling");
+    // retrigger aman: restart animasi jika class sudah terpasang sebelumnya
+    roll.getAnimations && roll.getAnimations().forEach(function (a) {
+      if (a.playState === "finished") { a.cancel(); a.play(); }
+    });
 
-    // tunggu roll selesai (durasi sudah dihitung otomatis)
-    await new Promise(function (r) { setTimeout(r, Math.max(0, t.total - t.closing)); });
+    // resize/rotasi: recalc jarak agar konten tidak terpotong
+    const onResize = function () {
+      roll.style.setProperty("--cs-end", "-" + (window.innerHeight + roll.scrollHeight) + "px");
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+
+    // tunggu roll selesai: berbasis animasi CSS nyata bila tersedia,
+    // dengan fallback timer yang SINKRON dengan durasi CSS (bukan hitungan teori)
+    await new Promise(function (resolve) {
+      const fallback = setTimeout(resolve, rollDur + 1000); // +1s guard
+      if (roll.getAnimations) {
+        const wait = function () {
+          const anims = roll.getAnimations().filter(function (a) { return a.animationName === "csScrollUp"; });
+          if (!anims.length) return; // animasi belum attach → poll lagi
+          anims[0].finished.then(function () { clearTimeout(fallback); resolve(); })
+            .catch(function () { clearTimeout(fallback); resolve(); });
+        };
+        setTimeout(wait, 100); setTimeout(wait, 400); setTimeout(wait, 1000);
+      }
+    });
+    window.removeEventListener("resize", onResize);
+    window.removeEventListener("orientationchange", onResize);
 
     // pesan penutup
     closingEl.classList.add("show");
