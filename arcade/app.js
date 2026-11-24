@@ -10,9 +10,33 @@ let T=0,AC=null,mus=0,musT=0,sfxOn=true;
 // ---------- audio (disintesis lokal, original, tanpa file) ----------
 function tone(f,t,d,v,ty){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+t;o.type=ty||"sine";o.frequency.value=f;g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+d)}catch(e){}}
 function sfx(k){if(!sfxOn)return;({ok:[523,659,784],no:[250,200],pop:[660],win:[523,659,784,1047]}[k]||[]).forEach((f,i)=>tone(f,i*.09,.25,.07,"triangle"))}
-const NT=[262,330,392,494,392,330,294,349,440,523,440,349];
-const mtick=()=>NT.forEach((f,i)=>tone(f,i*.5,.9,.035));
-$("#bm").onclick=()=>{if(mus){clearInterval(musT);mus=0}else{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}mtick();musT=setInterval(mtick,6000);mus=1}$("#bm").classList.toggle("off",!mus)};
+// ---------- musik latar: playlist acak dari arcade/music/ ----------
+const TRACKS=[
+"music/YTDown.com_YouTube_Media_34Na4j8AVgA_The-Weeknd-Starboy-ft-Daft-Punk-Official-Video_009_vbr.mp3",
+"music/YTDown.com_YouTube_Media_5EpyN_6dqyk_The-Weeknd-Playboi-Carti-Timeless-Official-Video_011_vbr.mp3",
+"music/YTDown.com_YouTube_Media_eitDnP0_83k_Mena-Massoud-Naomi-Scott-A-Whole-New-World-from-Aladdin-Official-Video_009_vbr.mp3",
+"music/YTDown.com_YouTube_Media_o_1aF54DO60_Lana-Del-Rey-Young-and-Beautiful_009_vbr.mp3",
+"music/YTDown.com_YouTube_Media_pRfmrE0ToTo_Anne-Marie-James-Arthur-Rewrite-The-Stars-from-The-Greatest-Showman-Reimagined_009_vbr.mp3",
+"music/YTDown.com_YouTube_Media_RnBT9uUYb1w_Martin-Garrix-Bebe-Rexha-In-The-Name-Of-Love-Official-Video_009_vbr.mp3",
+"music/YTDown.com_YouTube_Media_V9Wsm0hlLUI_Sour-Grapes_009_vbr.mp3",
+"music/YTDown.com_YouTube_Media_yzTuBuRdAyA_The-Weeknd-The-Hills-Official-Video_009_vbr.mp3"];
+const BG=new Audio();BG.volume=.45;let cur=-1;
+function nextTrack(autoplay){cur=(cur+1+Math.floor(Math.random()*(TRACKS.length-1)))%TRACKS.length;BG.src=TRACKS[cur];if(autoplay)BG.play().catch(()=>{})}
+nextTrack(false);
+BG.addEventListener("ended",()=>nextTrack(true)); // habis 1 lagu → acak lagi, tetap jalan
+function bgOn(){BG.play().then(()=>{$("#bm").classList.remove("off")}).catch(()=>{$("#bm").classList.add("off")})}
+function bgOff(){BG.pause();$("#bm").classList.add("off")}
+$("#bm").onclick=()=>{BG.paused?bgOn():bgOff()};
+$("#bn").onclick=()=>{nextTrack(true)}; // ⏩ next musik
+function askMusic(){ // popup setelah "Mulai Petualangan"
+  const ov=document.createElement("div");ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;padding:1rem";
+  ov.innerHTML=`<div style="background:#fff;border-radius:1.4rem;max-width:340px;width:100%;padding:1.6rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25)"><div style="font-size:2.6rem">🎵</div><h2 style="margin:.4rem 0">Mau pake musik biar asik?</h2><p style="opacity:.7;font-size:.9rem;margin-bottom:1.2rem">Bisa diubah kapan saja lewat tombol 🎵</p><div style="display:flex;gap:.8rem;justify-content:center"><button id="myes" style="flex:1;padding:.8rem;border:0;border-radius:.9rem;background:#e11d48;color:#fff;font-weight:700;font-size:1rem;cursor:pointer">Ya 🎶</button><button id="mno" style="flex:1;padding:.8rem;border:0;border-radius:.9rem;background:#eee;color:#333;font-weight:700;font-size:1rem;cursor:pointer">Tidak</button></div></div>`;
+  document.body.appendChild(ov);
+  const close=()=>ov.remove();
+  $("#myes").onclick=()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}bgOn();close()};
+  $("#mno").onclick=()=>{bgOff();close()};
+}
+const _oldDash=dash;
 $("#bs").onclick=()=>{sfxOn=!sfxOn;$("#bs").classList.toggle("off",!sfxOn);$("#bs").textContent=sfxOn?"🔊":"🔇"};
 $("#bm").classList.add("off");
 if(document.documentElement.requestFullscreen)$("#bf").onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{});else $("#bf").hidden=true;
@@ -26,7 +50,7 @@ const dn=()=>[0,1,2,3,4].filter(i=>S.d[i]).length;
 function shell(t,b){clearInterval(T);app.innerHTML=`<section class="card g"><button class="back" id="bk">← Dashboard</button><h2>${t}</h2>${b}</section>`;$("#bk").onclick=dash;scrollTo(0,0)}
 function finish(i,s,m,msg){S.d[i]={s,m};save();sfx("win");boom();app.innerHTML=`<section class="card g c"><div class="big">🎉</div><h2>${G[i].t} selesai!</h2><p><b>Skor: ${s}/${m}</b></p><p>${fill(msg)}</p><button class="btn" id="ok">${dn()===5&&!S.d[5]?"Buka Final Surprise 🎁":"Kembali ke Dashboard"}</button></section>`;$("#ok").onclick=dash}
 function home(){clearInterval(T);app.innerHTML=`<section class="card c"><div class="big bob">💖</div><h1>Welcome to AMBAR'S DAY ARCADE</h1><p>${fill(C.subtitle)}</p><label>Kamu mau dipanggil apa<input id="n1" maxlength="30" value="${esc(S.n)}"></label><button class="btn" id="go">Mulai Petualangan</button></section>`;
-$("#go").onclick=()=>{S.n=$("#n1").value.trim()||C.partner;S.f="Your Prince";S.go=1;save();sfx("pop");dash()}}
+$("#go").onclick=()=>{S.n=$("#n1").value.trim()||C.partner;S.f="Your Prince";S.go=1;save();sfx("pop");dash();askMusic()}}
 function dash(){clearInterval(T);const done=[0,1,2,3,4,5].filter(i=>S.d[i]).length,pct=Math.round(done/6*100),lv=["Pemula 🌱","Pencari Cinta 💗","Pejuang Rindu 💫","Ratu Arcade 👑"][Math.min(3,Math.floor(done/2))];
 app.innerHTML=`<section class="card c"><h1>${esc(S.n)}'s Day</h1><p class="sm">Level: ${lv}</p><div class="prog"><i style="width:${pct}%"></i></div><p class="sm">${done}/6 game selesai · ${pct}%</p></section>`+(S.d[5]?`<section class="card c"><div class="big bob">🏆</div><h2>Semua permainan selesai!</h2><p>${fill("Kamu menamatkan semuanya, {nama}. Aku bangga dan sayang banget sama kamu 💖")}</p></section>`:"")+`<div class="grid">`+G.map((g,i)=>{const lock=i===5&&dn()<5,d=S.d[i];return`<button class="gc ${lock?"lock":""} ${d?"done":""}" data-i="${i}"><span class="e">${lock?"🔒":d?"✅":g.e}</span><span><b>${g.t}</b><small>${lock?"Terkunci · selesaikan 5 game dulu":d?`Selesai · skor ${d.s}/${d.m}`:g.d}</small></span></button>`}).join("")+`</div><button class="lnk" id="ed">✏️ Ubah nama</button><button class="lnk" id="rs">Reset progres</button>`;
 $$(".gc").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(i===5&&dn()<5){sfx("no");toast("Selesaikan 5 game pertama dulu ya 💗");return}sfx("pop");G[i].f()});
