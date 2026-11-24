@@ -454,6 +454,9 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
 }
 #candle-intro.hidden{opacity:0;visibility:hidden;pointer-events:none}
 .candle-wrap{position:relative;filter:drop-shadow(0 0 40px rgba(255,160,40,.25))}
+/* area klik tersembunyi di api lilin: klik api = masuk tanpa meniup (mode cek laptop) */
+.flame-hit{position:absolute;bottom:calc(100% - 8px);left:50%;transform:translateX(-50%);
+  width:120px;height:110px;z-index:5;cursor:pointer;background:transparent;border:0;padding:0}
 .flame{
   width:28px;height:64px;border-radius:50% 50% 50% 50%/62% 62% 38% 38%;
   background:radial-gradient(circle at 50% 75%,#fff7cc 0%,#ffd23e 40%,#ff8c1a 70%,#e8590c 100%);
@@ -507,6 +510,7 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
   <div class="candle-wrap">
     <div class="candle-glow"></div>
     <div class="flame" id="flame"></div>
+    <button class="flame-hit" id="flameHit" aria-label="Masuk tanpa meniup (rahasia)" title=""></button>
     <div class="candle-body"></div>
   </div>
   <p class="intro-title">Make a Wish<br>tiup lilinnya yg kenceng ya 🕯️</p>
@@ -756,7 +760,8 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
         flame=document.getElementById('flame'),
         btn=document.getElementById('micBtn'),
         bar=document.getElementById('micbar'),
-        fallback=document.getElementById('introFallback');
+        fallback=document.getElementById('introFallback'),
+        hit=document.getElementById('flameHit');
   const BLOW_THRESHOLD=0.35; // volume RMS untuk mematikan api (0-1) — diturunkan agar mudah ditiup
   const BLOW_HOLD_MS=280;    // harus di atas threshold selama ini (anti spike/noise) — lebih pendek
   let blown=false, blowStart=0;
@@ -863,6 +868,23 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
   function enter(){
     intro.classList.add('hidden');
     setTimeout(()=>intro.remove(), 1800);
+  }
+
+  // klik api lilin = jalan pintas rahasia: masuk tanpa mic/meniup + musik mulai
+  if(hit){
+    hit.addEventListener('click', ()=>{
+      if(blown) return;
+      blown=true;
+      const glow=document.querySelector('.candle-glow');
+      flame.style.transition='opacity .6s ease, transform .6s ease';
+      flame.style.opacity='0';
+      flame.style.transform='translateX(-50%) scale(.3,.06)';
+      if(glow){ glow.style.transition='opacity .8s ease'; glow.style.opacity='0'; }
+      setTimeout(()=>{
+        window.__startBirthdayMusic();
+        enter();
+      }, 500);
+    });
   }
 })();
 
