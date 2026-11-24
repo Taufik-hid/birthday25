@@ -8,8 +8,26 @@
 (function () {
   "use strict";
 
-  const SCENE_BASE = "/credit-scene/"; // absolut dari root site (arcade ada di /arcade/)
-  const REPO_BASE = ""; // foto memakai path relatif repo root (dilayani dari root site)
+  // Base URL diturunkan dari lokasi script ini sendiri, bukan dari "/" —
+  // GitHub Pages project site melayani repo di /birthday25/, bukan di root domain.
+  // Dengan cara ini juga tetap benar saat dites dari root lokal.
+  const SCENE_BASE = (function () {
+    var el = document.currentScript;
+    if (!el || !el.src) {
+      var ss = document.getElementsByTagName("script");
+      for (var i = 0; i < ss.length; i++) {
+        if (/credit-scene\/credits\.js/.test(ss[i].src)) { el = ss[i]; break; }
+      }
+    }
+    if (el && el.src) {
+      try { return new URL(".", el.src).href; } catch (e) {}
+    }
+    return "/credit-scene/";
+  })();
+  // Root site = satu level di atas credit-scene/ (tempat photos.json memakai path relatif repo)
+  const REPO_BASE = (function () {
+    try { return new URL("../", SCENE_BASE).href; } catch (e) { return "/"; }
+  })();
 
   // ---------- util ----------
   function fetchJSON(url) {
@@ -148,8 +166,8 @@
     photos.forEach(function (p, i) {
       const big = i % 3 === 0; // pola: 1 spotlight, 2 sisi teks
       html += big
-        ? '<div class="cs-item cs-spotlight"><img class="cs-photo" loading="lazy" src="/' + p + '" alt="Kenangan ' + (i + 1) + '"><div class="cs-cap">Moment ' + (i + 1) + '</div></div>'
-        : '<div class="cs-item cs-side"><div class="cs-role">' + (i % 2 === 1 ? 'Starring' : 'And') + '</div><div class="cs-name">' + (i % 2 === 1 ? 'Kamu 💖' : 'Aku') + '</div><img class="cs-photo cs-photo-sm" loading="lazy" src="/' + p + '" alt="Kenangan ' + (i + 1) + '"></div>';
+        ? '<div class="cs-item cs-spotlight"><img class="cs-photo" loading="lazy" src="' + REPO_BASE + p + '" alt="Kenangan ' + (i + 1) + '"><div class="cs-cap">Moment ' + (i + 1) + '</div></div>'
+        : '<div class="cs-item cs-side"><div class="cs-role">' + (i % 2 === 1 ? 'Starring' : 'And') + '</div><div class="cs-name">' + (i % 2 === 1 ? 'Kamu 💖' : 'Aku') + '</div><img class="cs-photo cs-photo-sm" loading="lazy" src="' + REPO_BASE + p + '" alt="Kenangan ' + (i + 1) + '"></div>';
     });
     html += '<div class="cs-end-block"><p class="cs-the-end">The End</p></div>';
     roll.innerHTML = html;
@@ -214,7 +232,12 @@
           videoDur = (video.duration || 0) * 1000;
           setTimeout(done, videoDur + 30000);
         };
-        video.play().catch(function () { done(); }); // autoplay ditolak → skip video
+        video.play().catch(function () {
+          // autoplay bersuara ditolak → coba muted (video tetap jalan, tanpa musik ganda)
+          video.muted = true;
+          video.play().then(function () { /* muted sukses */ })
+            .catch(function () { console.warn("[credits] autoplay ditolak — skip video"); done(); });
+        }); // autoplay ditolak → skip video
       });
       video.classList.remove("show");
     }
@@ -229,16 +252,27 @@
 
     // durasi roll diikat ke total (CSS transition)
     roll.style.animationDuration = (t.total - t.closing) + "ms";
+    // jarak animasi dari tinggi konten AKTUAL: seluruh konten keluar melewati
+    // viewport atas (viewport-height + scrollHeight), bukan -260% statis
+    roll.style.setProperty("--cs-end", "-" + (window.innerHeight + roll.scrollHeight) + "px");
     ov.classList.add("cs-rolling");
 
-    // preload selektif: 3 foto ke depan
-    let preloaded = 0;
-    (function preloadNext() {
-      if (preloaded >= photos.length) return;
-      preloadPhoto("/" + photos[preloaded], 8000);
-      preloaded++;
-      if (preloaded < photos.length) setTimeout(preloadNext, 1200);
-    })();
+    // preload SEMUA foto dengan concurrency terbatas SEBELUM animasi —
+    // lazy loading di dalam animasi CSS menyebabkan foto terlambat muncul
+    const CONCURRENCY = 4;
+    let cursor = 0;
+    async function preloadAll() {
+      const workers = Array.from({ length: CONCURRENCY }, function () {
+        return (async function () {
+          while (cursor < photos.length) {
+            const i = cursor++;
+            await preloadPhoto(REPO_BASE + photos[i], 10000);
+          }
+        })();
+      });
+      await Promise.all(workers);
+    }
+    await preloadAll();
 
     // tunggu roll selesai (durasi sudah dihitung otomatis)
     await new Promise(function (r) { setTimeout(r, Math.max(0, t.total - t.closing)); });

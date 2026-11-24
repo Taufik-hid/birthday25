@@ -90,6 +90,13 @@ $("#gf").onclick=()=>{sfx("win");boom();$("#gf").classList.add("open");setTimeou
 function finalCredits(e){
   if(e) e.preventDefault();
   const goDash=()=>dash();
+  // fullscreen WAJIB sinkron di dalam gesture klik — sebelum async apa pun —
+  // kalau tidak, browser menolak (transient activation hilang saat await fetch video).
+  try{
+    const d=document.documentElement;
+    if(d.requestFullscreen) d.requestFullscreen().catch(function(){});
+    else if(d.webkitRequestFullscreen) d.webkitRequestFullscreen();
+  }catch(err){}
   if(window.CreditScene && window.CreditScene.run){
     sfx("win");boom();
     window.CreditScene.run({onDone:goDash}).catch(function(err){
