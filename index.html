@@ -637,12 +637,13 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
   <p class="section-label reveal">Kupersembahkan juga sebuah mahakarya</p>
   <h2 class="section-title reveal" id="video">Our romantic dancing</h2>
   <div class="video-wrap reveal">
-    <video controls preload="metadata" playsinline poster="media/foto4.jpg">
+    <video id="romantic-video" controls preload="metadata" playsinline poster="media/foto4.jpg">
       <source src="media/video.mp4" type="video/mp4">
       Browser kamu belum mendukung video HTML. Tapi tenang, momennya tetap tersimpan di hati. 💗
     </video>
   </div>
 </section>
+<!-- Musik latar otomatis fade-out saat video diputar, fade-in lanjut setelah video selesai -->
 
 <!-- QUIZ -->
 <section aria-labelledby="kuis">
@@ -756,8 +757,8 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
         btn=document.getElementById('micBtn'),
         bar=document.getElementById('micbar'),
         fallback=document.getElementById('introFallback');
-  const BLOW_THRESHOLD=0.72; // volume RMS untuk mematikan api (0-1), lebih tinggi = lebih sulit
-  const BLOW_HOLD_MS=700;    // harus di atas threshold selama ini (anti spike/noise)
+  const BLOW_THRESHOLD=0.35; // volume RMS untuk mematikan api (0-1) — diturunkan agar mudah ditiup
+  const BLOW_HOLD_MS=280;    // harus di atas threshold selama ini (anti spike/noise) — lebih pendek
   let blown=false, blowStart=0;
   let musicStarted=false;
 
@@ -1030,6 +1031,53 @@ footer .h{font-family:'Dancing Script',cursive;color:var(--primary);font-weight:
     else start();
   });
   // Autoplay dinonaktifkan: musik mulai otomatis SETELAH lilin berhasil ditiup (window.__startBirthdayMusic)
+})();
+
+// video ↔ musik: fade-out musik saat video diputar, fade-in lanjut saat video selesai
+(function(){
+  const video=document.getElementById('romantic-video'),
+        audio=document.getElementById('bg-music'),
+        btn=document.getElementById('music-btn'),
+        icon=document.getElementById('music-icon');
+  if(!video || !audio) return;
+  let fading=null;
+  const NORMAL_VOL=1;
+
+  function setIconSafe(on){
+    if(!btn || !icon) return;
+    icon.textContent = on ? '⏸' : '🎵';
+    btn.classList.toggle('playing', on);
+  }
+
+  function fadeTo(target, dur, done){
+    if(fading) cancelAnimationFrame(fading);
+    const from=audio.volume, t0=performance.now();
+    (function step(){
+      if(audio.paused && target>0){ fading=null; return; } // diblokir/pause manual — batal
+      const p=Math.min(1,(performance.now()-t0)/dur);
+      audio.volume=from+(target-from)*(p*p*(3-2*p)); // smoothstep
+      if(p<1){ fading=requestAnimationFrame(step); }
+      else { fading=null; if(done) done(); }
+    })();
+  }
+
+  function duckOut(){ // video mulai → musik perlahan mengecil lalu pause (posisi disimpan otomatis)
+    if(audio.paused) return;
+    setIconSafe(false);
+    fadeTo(0, 900, ()=>{ if(!video.paused && !video.ended) audio.pause(); });
+  }
+
+  function duckIn(){ // video selesai/di-stop → musik lanjut dari posisi terakhir, volume perlahan naik
+    if(video.paused && !video.ended) return;        // user hanya pause video sebentar → biarkan musik mati
+    if(!video.ended && video.currentTime>0) return; // masih dalam video (seek) → jangan nyalakan
+    if(!audio.src) return;
+    audio.volume=0;
+    audio.play().then(()=>{ setIconSafe(true); fadeTo(NORMAL_VOL, 2500); }).catch(()=>{});
+  }
+
+  video.addEventListener('play', duckOut);
+  video.addEventListener('ended', duckIn);
+  video.addEventListener('pause', ()=>{ if(video.ended) duckIn(); });
 })();
 </script>
 </body>
