@@ -166,8 +166,8 @@
     photos.forEach(function (p, i) {
       const big = i % 3 === 0; // pola: 1 spotlight, 2 sisi teks
       html += big
-        ? '<div class="cs-item cs-spotlight"><img class="cs-photo" loading="lazy" src="' + REPO_BASE + p + '" alt="Kenangan ' + (i + 1) + '"><div class="cs-cap">Moment ' + (i + 1) + '</div></div>'
-        : '<div class="cs-item cs-side"><div class="cs-role">' + (i % 2 === 1 ? 'Starring' : 'And') + '</div><div class="cs-name">' + (i % 2 === 1 ? 'Kamu 💖' : 'Aku') + '</div><img class="cs-photo cs-photo-sm" loading="lazy" src="' + REPO_BASE + p + '" alt="Kenangan ' + (i + 1) + '"></div>';
+        ? '<div class="cs-item cs-spotlight"><img class="cs-photo" src="' + REPO_BASE + p + '" alt="Kenangan ' + (i + 1) + '"><div class="cs-cap">Moment ' + (i + 1) + '</div></div>'
+        : '<div class="cs-item cs-side"><div class="cs-role">' + (i % 2 === 1 ? 'Starring' : 'And') + '</div><div class="cs-name">' + (i % 2 === 1 ? 'Kamu 💖' : 'Aku') + '</div><img class="cs-photo cs-photo-sm" src="' + REPO_BASE + p + '" alt="Kenangan ' + (i + 1) + '"></div>';
     });
     html += '<div class="cs-end-block"><p class="cs-the-end">The End</p></div>';
     roll.innerHTML = html;
