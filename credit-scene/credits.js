@@ -250,15 +250,10 @@
     const roll = buildRoll(photos, cfg);
     const t = computeTimings(photos.length, videoDur, cfg);
 
-    // durasi roll diikat ke total (CSS transition)
-    roll.style.animationDuration = (t.total - t.closing) + "ms";
-    // jarak animasi dari tinggi konten AKTUAL: seluruh konten keluar melewati
-    // viewport atas (viewport-height + scrollHeight), bukan -260% statis
-    roll.style.setProperty("--cs-end", "-" + (window.innerHeight + roll.scrollHeight) + "px");
-    ov.classList.add("cs-rolling");
-
-    // preload SEMUA foto dengan concurrency terbatas SEBELUM animasi —
-    // lazy loading di dalam animasi CSS menyebabkan foto terlambat muncul
+    // preload SEMUA foto dengan concurrency terbatas SEBELUM animasi dimulai —
+    // animasi yang jalan duluan menyebabkan foto blank di awal roll.
+    // Foto gagal dimuat di-resolve null (preloadPhoto) → scene tetap jalan,
+    // hanya <img> terkait yang kosong, tidak menggagalkan keseluruhan.
     const CONCURRENCY = 4;
     let cursor = 0;
     async function preloadAll() {
@@ -273,6 +268,13 @@
       await Promise.all(workers);
     }
     await preloadAll();
+
+    // durasi roll diikat ke total (CSS transition)
+    roll.style.animationDuration = (t.total - t.closing) + "ms";
+    // jarak animasi dari tinggi konten AKTUAL — dihitung SETELAH preload agar
+    // scrollHeight sudah final (foto punya aspect-ratio tetap, jadi aman)
+    roll.style.setProperty("--cs-end", "-" + (window.innerHeight + roll.scrollHeight) + "px");
+    ov.classList.add("cs-rolling");
 
     // tunggu roll selesai (durasi sudah dihitung otomatis)
     await new Promise(function (r) { setTimeout(r, Math.max(0, t.total - t.closing)); });
