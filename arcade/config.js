@@ -1,7 +1,7 @@
 // ✏️ EDIT FILE INI untuk personalisasi. Gunakan {nama} dan {pengirim} di teks mana pun.
 window.CONFIG={
-partner:"Ambar", sender:"Aku", birthday:"2026-11-20",
-subtitle:"Hadiah kecil dari jauh, supaya kamu tahu kamu selalu dekat di hatiku 💗",
+partner:"Ambar", sender:"Your Prince", birthday:"2026-11-20",
+subtitle:"Game nya gampang kok, setelah ini baru boleh buka hadiahnya 💗",
 // a = nomor jawaban benar (mulai dari 0)
 quiz:[
 {q:"Di mana pertama kali kita bertemu/ngobrol?",o:["Di dunia maya","Lewat teman","Di kampus","Di acara keluarga"],a:2},
