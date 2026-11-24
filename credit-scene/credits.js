@@ -117,7 +117,9 @@
     const END_PAD_MS = 4000;           // buffer akhir sebelum credits selesai
     const scrollDur = nPhotos * SCROLL_MS_PER_ITEM + 6000; // + intro credits title
     const closing = (cfg.closingMessageSeconds || 6) * 1000;
-    const total = Math.max(scrollDur, videoDurMs || 0) + closing + FADE_MS + END_PAD_MS;
+    // video SUDAH selesai sebelum credits mulai → durasi credits murni dari jumlah foto,
+    // bukan di-stretch mengikuti durasi video
+    const total = scrollDur + closing + FADE_MS + END_PAD_MS;
     return { scrollDur: scrollDur, closing: closing, fade: FADE_MS, total: total };
   }
 
@@ -207,8 +209,11 @@
         video.onloadedmetadata = function () { videoDur = (video.duration || 0) * 1000; };
         video.onended = done;
         video.onerror = function () { console.warn("[credits] video pembuka gagal — lanjut ke credits"); video.classList.remove("show"); done(); };
-        // safety: jangan biarkan video menggantung > 90s
-        setTimeout(done, 90000);
+        // safety: durasi video + 30s margin (timeout statis 90s memotong video panjang)
+        video.onloadedmetadata = function () {
+          videoDur = (video.duration || 0) * 1000;
+          setTimeout(done, videoDur + 30000);
+        };
         video.play().catch(function () { done(); }); // autoplay ditolak → skip video
       });
       video.classList.remove("show");
