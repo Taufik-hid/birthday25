@@ -1,0 +1,6 @@
+{
+  "cloudinaryVideoUrl": "",
+  "videoFallbackNote": "Isi cloudinaryVideoUrl dengan URL delivery Cloudinary (res.cloudinary.com/.../video/upload/...mp4). Selama kosong, credit scene langsung mulai dari rolling credits tanpa video pembuka.",
+  "closingMessage": "Terima kasih sudah menjadi bagian terbaik dalam hidupku. Aku sayang kamu, selalu. 💖",
+  "closingMessageSeconds": 6
+}

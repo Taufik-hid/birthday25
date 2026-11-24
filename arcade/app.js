@@ -21,6 +21,7 @@ const TRACKS=[
 "music/YTDown.com_YouTube_Media_V9Wsm0hlLUI_Sour-Grapes_009_vbr.mp3",
 "music/YTDown.com_YouTube_Media_yzTuBuRdAyA_The-Weeknd-The-Hills-Official-Video_009_vbr.mp3"];
 const BG=new Audio();BG.volume=.45;let cur=-1;
+window.__arcadeBgAudio=BG; // diekspos untuk Romantic Cinematic End Credits (tanpa instance kedua)
 function nextTrack(autoplay){cur=(cur+1+Math.floor(Math.random()*(TRACKS.length-1)))%TRACKS.length;BG.src=TRACKS[cur];if(autoplay)BG.play().catch(()=>{})}
 nextTrack(false);
 BG.addEventListener("ended",()=>nextTrack(true)); // habis 1 lagu → acak lagi, tetap jalan
@@ -82,5 +83,20 @@ $$(".mini").forEach(b=>b.onclick=()=>{ds.add(+b.dataset.i);b.textContent="✓";b
 // ---------- game 6 ----------
 function fin(){if(dn()<5){toast("Selesaikan 5 game pertama dulu ya 💗");return dash()}
 shell("🎁 The Final Surprise",`<div class="c" id="fz"><button class="gift" id="gf" aria-label="Buka hadiah">🎁</button><p>Ketuk hadiahnya, ${esc(S.n)}!</p></div>`);
-$("#gf").onclick=()=>{sfx("win");boom();$("#gf").classList.add("open");setTimeout(()=>{S.d[5]={s:1,m:1};save();$("#fz").innerHTML=`<div class="big">💖</div><div class="letter">`+C.letter.split(/\n\s*\n/).map(p=>`<p>${fill(p).replace(/\n/g,"<br>")}</p>`).join("")+`</div><h2 class="end">${C.closing}</h2><button class="btn" id="ok">Kembali ke Dashboard</button>`;$("#ok").onclick=dash;boom()},700)}}
+$("#gf").onclick=()=>{sfx("win");boom();$("#gf").classList.add("open");setTimeout(()=>{S.d[5]={s:1,m:1};save();$("#fz").innerHTML=`<div class="big">💖</div><div class="letter">`+C.letter.split(/\n\s*\n/).map(p=>`<p>${fill(p).replace(/\n/g,"<br>")}</p>`).join("")+`</div><h2 class="end">${C.closing}</h2><button class="btn" id="ok">Kembali ke Dashboard</button>`;$("#ok").onclick=finalCredits;boom()},700)}
+
+// Romantic Cinematic End Credits — dipicu TOMBOL "Kembali ke Dashboard" di The Final Surprise saja.
+// Navigasi normal dicegah; setelah credits selesai, baru kembali ke dashboard.
+function finalCredits(e){
+  if(e) e.preventDefault();
+  const goDash=()=>dash();
+  if(window.CreditScene && window.CreditScene.run){
+    sfx("win");boom();
+    window.CreditScene.run({onDone:goDash}).catch(function(err){
+      console.warn("[credits] gagal, fallback ke dashboard:",err);
+      goDash();
+    });
+  } else goDash(); // modul gagal dimuat → perilaku lama
+}
+}
 S.go?dash():home();

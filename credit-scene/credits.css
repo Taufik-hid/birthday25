@@ -1,0 +1,54 @@
+/* Romantic Cinematic End Credits — gaya film: hitam elegan, serif ivory & warm gold,
+   film grain + vignette halus, roll vertikal smooth. Overlay fixed = fallback fullscreen. */
+#credit-scene-overlay{position:fixed;inset:0;z-index:9999;background:#000;
+  font-family:Georgia,'Times New Roman',serif;color:#f5efe0;overflow:hidden}
+#credit-scene-overlay.cs-no-fs{position:fixed} /* fullscreen gagal → tetap full viewport */
+.cs-stage{position:absolute;inset:0}
+#cs-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;
+  opacity:0;transition:opacity .6s ease}
+#cs-video.show{opacity:1}
+.cs-credits-wrap{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#000}
+.cs-fade-black .cs-credits-wrap{opacity:1}
+#credit-scene-overlay.cs-fade-out{opacity:0;transition:opacity .9s ease}
+.cs-grain{position:absolute;inset:-50%;pointer-events:none;opacity:.05;
+  background-image:repeating-radial-gradient(circle at 17% 32%,#fff 0,#fff 1px,transparent 2px),
+                   repeating-radial-gradient(circle at 71% 61%,#fff 0,#fff 1px,transparent 2px);
+  animation:csGrain .4s steps(3) infinite}
+@keyframes csGrain{0%{transform:translate(0,0)}33%{transform:translate(-8px,5px)}66%{transform:translate(6px,-7px)}100%{transform:translate(0,0)}}
+.cs-vignette{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.75) 100%)}
+.cs-roll{position:absolute;left:50%;transform:translateX(-50%);width:min(680px,92vw);
+  text-align:center;will-change:transform;animation:csScroll linear forwards;animation-duration:60s}
+@keyframes csScroll{from{transform:translate(-50,0)}to{transform:translate(-50%,-115%)}}
+@keyframes csScrollUp{from{top:100vh}to{top:-260%}}
+.cs-roll{top:100vh;animation-name:csScrollUp}
+.cs-title-block{margin-bottom:8vh}
+.cs-main-title{font-size:clamp(2.6rem,7vw,4.4rem);font-weight:400;color:#f5efe0;
+  letter-spacing:.18em;margin:0 0 1rem;text-shadow:0 2px 24px rgba(212,175,55,.35)}
+.cs-sub-title{font-style:italic;color:#d4af37;opacity:.9;font-size:clamp(1rem,2.6vw,1.3rem)}
+.cs-item{margin:9vh 0;animation:csFade 1.1s ease}
+@keyframes csFade{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.cs-spotlight img.cs-photo{width:min(440px,80vw);aspect-ratio:3/4;object-fit:cover;
+  border-radius:10px;box-shadow:0 24px 70px rgba(212,175,55,.22),0 4px 18px rgba(0,0,0,.6);
+  border:1px solid rgba(212,175,55,.35)}
+.cs-cap{margin-top:.8rem;color:#d4af37;font-style:italic;letter-spacing:.12em;font-size:.9rem}
+.cs-side{display:flex;align-items:center;gap:1.4rem;text-align:left;background:rgba(255,255,255,.025);
+  border:1px solid rgba(212,175,55,.16);border-radius:14px;padding:1rem 1.3rem;max-width:560px;margin:7vh auto}
+.cs-role{color:#d4af37;text-transform:uppercase;letter-spacing:.3em;font-size:.72rem;min-width:64px}
+.cs-name{font-size:1.15rem;color:#f5efe0;font-style:italic}
+.cs-photo-sm{width:96px;height:96px;object-fit:cover;border-radius:10px;margin-left:auto;
+  border:1px solid rgba(212,175,55,.3);box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.cs-end-block{margin-top:14vh;text-align:center}
+.cs-the-end{font-size:clamp(2rem,6vw,3.2rem);color:#d4af37;letter-spacing:.4em;text-shadow:0 2px 30px rgba(212,175,55,.4)}
+.cs-closing{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:2rem;text-align:center;font-size:clamp(1.3rem,3.6vw,2rem);font-style:italic;color:#f5efe0;
+  opacity:0;visibility:hidden;transition:opacity 1.4s ease;background:rgba(0,0,0,.92);z-index:3}
+.cs-closing.show{opacity:1;visibility:visible}
+@media (max-width:640px){
+  .cs-side{flex-direction:column;text-align:center;gap:.6rem}
+  .cs-photo-sm{margin:0 auto}
+  .cs-roll{width:94vw}
+}
+@media (prefers-reduced-motion:reduce){
+  .cs-grain{animation:none}.cs-item{animation:none}
+}
