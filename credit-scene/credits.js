@@ -271,12 +271,15 @@
 
     // durasi & jarak dulu, BARU class cs-rolling → animasi mulai dari 0 dengan nilai final
     roll.style.animationDuration = (t.total - t.closing) + "ms";
-    // jarak animasi dari tinggi konten AKTUAL — dihitung SETELAH preload agar
-    // scrollHeight sudah final (foto punya aspect-ratio tetap, jadi aman)
-    roll.style.setProperty("--cs-end", "-" + (window.innerHeight + roll.scrollHeight) + "px");
+    // jarak animasi dari tinggi konten AKTUAL (setelah preload, scrollHeight final).
+    // Animasi pakai transform translateY → --cs-end = total jarak vertikal:
+    // 100vh (mulai di bawah layar) + tinggi seluruh konten (sampai habis di atas)
+    const setEnd = function () {
+      roll.style.setProperty("--cs-end", "-" + (window.innerHeight + roll.scrollHeight) + "px");
+    };
+    setEnd();
     // sinkronkan timer JS dengan durasi CSS: mulai dari sini
     const rollDur = t.total - t.closing;
-    const rollStart = Date.now();
     ov.classList.add("cs-rolling");
     // retrigger aman: restart animasi jika class sudah terpasang sebelumnya
     roll.getAnimations && roll.getAnimations().forEach(function (a) {
@@ -284,9 +287,7 @@
     });
 
     // resize/rotasi: recalc jarak agar konten tidak terpotong
-    const onResize = function () {
-      roll.style.setProperty("--cs-end", "-" + (window.innerHeight + roll.scrollHeight) + "px");
-    };
+    const onResize = function () { setEnd(); };
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", onResize);
 

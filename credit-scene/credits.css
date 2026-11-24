@@ -17,16 +17,16 @@
 @keyframes csGrain{0%{transform:translate(0,0)}33%{transform:translate(-8px,5px)}66%{transform:translate(6px,-7px)}100%{transform:translate(0,0)}}
 .cs-vignette{position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.75) 100%)}
-.cs-roll{position:absolute;left:50%;transform:translateX(-50%);width:min(680px,92vw);
-  text-align:center;will-change:top;top:100vh}
+.cs-roll{position:absolute;left:50%;top:0;width:min(680px,92vw);
+  text-align:center;will-change:transform;transform:translate3d(-50%,100vh,0)}
 /* TANPA animasi di base rule — animasi HANYA dimulai lewat class cs-rolling di overlay,
    setelah video selesai + preload foto tuntas + --cs-end & duration di-set oleh JS.
-   (Dulu: animation langsung di .cs-roll → animasi 60s default berjalan sejak overlay
-   dibuat, sehingga saat video selesai animasi sudah selesai/hampir selesai → foto diam.) */
+   Animasi memakai TRANSFORM (GPU/compositor) bukan top (layout) — top menyebabkan
+   re-layout tiap frame → macet/micin pada konten 55 foto. */
 .cs-rolling .cs-roll{animation:csScrollUp linear forwards}
 /* Jarak animasi DIHITUNG via JS dari scrollHeight aktual (set CSS var --cs-end)
    — bukan -260% statis yang salah untuk konten panjang/pendek. Default aman: */
-@keyframes csScrollUp{from{top:100vh}to{top:var(--cs-end,-260%)}}
+@keyframes csScrollUp{from{transform:translate3d(-50%,100vh,0)}to{transform:translate3d(-50%,var(--cs-end,-260%),0)}}
 .cs-title-block{margin-bottom:8vh}
 .cs-main-title{font-size:clamp(2.6rem,7vw,4.4rem);font-weight:400;color:#f5efe0;
   letter-spacing:.18em;margin:0 0 1rem;text-shadow:0 2px 24px rgba(212,175,55,.35)}
