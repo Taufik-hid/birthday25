@@ -1,6 +1,94 @@
 {
   "cloudinaryVideoUrl": "https://res.cloudinary.com/avjsfbud/video/upload/v1795508868/video.mp4",
-  "videoFallbackNote": "Isi cloudinaryVideoUrl dengan URL delivery Cloudinary (res.cloudinary.com/.../video/upload/...mp4). Selama kosong, credit scene langsung mulai dari rolling credits tanpa video pembuka.",
+  "videoFallbackNote": "Isi cloudinaryVideoUrl dengan URL Cloudinary (…/video/upload/…mp4). Kosongkan untuk langsung mulai dari credits tanpa video pembuka.",
+
+  "title": "Our Story",
+  "subtitle": "Sebuah film tentang kita berdua",
+  "presents": "Taufik mempersembahkan",
+
+  "music": {
+    "src": "arcade/music/YTDown.com_YouTube_Media_o_1aF54DO60_Lana-Del-Rey-Young-and-Beautiful_009_vbr.mp3",
+    "durationSec": 238,
+    "volume": 0.85,
+    "fadeInSec": 3,
+    "fadeOutSec": 6,
+    "label": "Young and Beautiful — Lana Del Rey"
+  },
+
+  "chapters": [
+    {
+      "title": "Resmi",
+      "date": "April – Mei 2023",
+      "place": "Silancur · Bantul",
+      "from": 1, "to": 7, "pace": 1.25, "layout": "single",
+      "captions": ["1 hari setelah kamu resmi mempercayaiku", "Awal dari semuanya"]
+    },
+    {
+      "title": "First Journey",
+      "date": "13 Mei 2023",
+      "place": "Solo",
+      "from": 8, "to": 11, "pace": 1.1, "layout": "single",
+      "captions": ["Pertama kali kita keluar kota"]
+    },
+    {
+      "title": "Jarak Bukan Masalah",
+      "date": "Juni – Oktober 2023",
+      "place": "Malang · dan di mana pun kita sempat bertemu",
+      "from": 12, "to": 27, "pace": 0.8, "layout": "mix",
+      "captions": ["KKN 45 hari tidak menghalangi kita", "Tetap ketemu, tetap main"]
+    },
+    {
+      "title": "Dua Puluh Dua",
+      "date": "8 November 2023",
+      "place": "Ulang tahunmu yang pertama bersamaku",
+      "from": 28, "to": 31, "pace": 1.25, "layout": "single",
+      "captions": ["Selamat ulang tahun, Ambar"]
+    },
+    {
+      "title": "Dingin yang Hangat",
+      "date": "Desember 2023 – April 2024",
+      "place": "Dieng · suhu di bawah 10°",
+      "from": 32, "to": 40, "pace": 0.85, "layout": "mix",
+      "captions": ["Eksplor kota ke-3 kita"]
+    },
+    {
+      "title": "Masih Berlanjut",
+      "date": "2025 – 2026",
+      "place": "Surabaya · Jakarta · dan seterusnya",
+      "from": 41, "to": 55, "pace": 1.1, "layout": "mix",
+      "captions": ["Perjalanan masih tetap berlanjut", "Idolamu kini jadi idolaku juga"]
+    }
+  ],
+
+  "credits": {
+    "seconds": 34,
+    "sections": [
+      { "role": "Dibintangi oleh", "names": ["Ambar"] },
+      { "role": "Disutradarai, ditulis, dan di-edit oleh", "names": ["Taufik"], "note": "(yang ngoding sampai larut malam)" },
+      { "role": "Pemeran Pembantu", "names": ["Bakso", "Bayangan Sendiri", "Warna BlackPink"] },
+      { "role": "Film Pertama Kita", "names": ["Ant-Man"] },
+      { "role": "Stunt", "names": ["Adu Kayang"], "note": "Adegan berbahaya dilakukan oleh ahlinya. Jangan ditiru di rumah." },
+      { "role": "Lokasi Syuting", "names": ["Silancur", "Bantul", "Solo", "Malang", "Dieng", "Surabaya", "Jakarta"] },
+      { "role": "Sinematografi", "names": ["Kamera HP yang pasrah difoto berkali-kali"] },
+      { "role": "Efek Suara", "names": ["Tawa Ambar"] },
+      { "role": "Terima Kasih Khusus", "names": ["Sinyal video call yang selalu bertahan", "Semua kereta, motor, dan jarak yang kita lewati"] },
+      { "role": "Musik", "names": ["Young and Beautiful", "Lana Del Rey"] },
+      { "role": "", "names": ["Tidak ada pacar yang dirugikan", "dalam pembuatan film ini."], "note": "Film ini didedikasikan untuk Ambar, 25 tahun." }
+    ],
+    "sidePhotos": [4, 7, 13, 20, 29, 38, 46, 52]
+  },
+
+  "theEnd": "The End",
+  "theEndNote": "…atau mungkin baru permulaan",
+
+  "postCredit": {
+    "photo": 53,
+    "focusY": 70,
+    "message": "Terima kasih sudah menjadi bagian terbaik dalam hidupku. Aku sayang kamu, selalu. 💖",
+    "hint": "psst… kado susulannya menunggu 🎁",
+    "holdSeconds": 5
+  },
+
   "closingMessage": "Terima kasih sudah menjadi bagian terbaik dalam hidupku. Aku sayang kamu, selalu. 💖",
   "closingMessageSeconds": 6
 }

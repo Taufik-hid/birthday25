@@ -1,59 +1,155 @@
-/* Romantic Cinematic End Credits — gaya film: hitam elegan, serif ivory & warm gold,
-   film grain + vignette halus, roll vertikal smooth. Overlay fixed = fallback fullscreen. */
-#credit-scene-overlay{position:fixed;inset:0;z-index:9999;background:#000;
-  font-family:Georgia,'Times New Roman',serif;color:#f5efe0;overflow:hidden}
-#credit-scene-overlay.cs-no-fs{position:fixed} /* fullscreen gagal → tetap full viewport */
-.cs-stage{position:absolute;inset:0}
-#cs-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;
-  opacity:0;transition:opacity .6s ease}
-#cs-video.show{opacity:1}
-.cs-credits-wrap{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#000}
-.cs-fade-black .cs-credits-wrap{opacity:1}
+/* Cinematic End Credits v2 — hitam elegan, ivory & emas, letterbox, grain, Ken Burns.
+   Overlay fixed = fallback saat fullscreen ditolak. Semua animasi memakai transform/opacity. */
+#credit-scene-overlay{position:fixed;inset:0;z-index:9999;background:#000;color:#f5efe0;overflow:hidden;
+  font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;
+  --gold:#d4af37;--ivory:#f5efe0;--bar:11vh}
+@media (max-aspect-ratio:1/1){#credit-scene-overlay{--bar:5vh}}
 #credit-scene-overlay.cs-fade-out{opacity:0;transition:opacity .9s ease}
-.cs-grain{position:absolute;inset:-50%;pointer-events:none;opacity:.05;
-  background-image:repeating-radial-gradient(circle at 17% 32%,#fff 0,#fff 1px,transparent 2px),
-                   repeating-radial-gradient(circle at 71% 61%,#fff 0,#fff 1px,transparent 2px);
-  animation:csGrain .4s steps(3) infinite}
-@keyframes csGrain{0%{transform:translate(0,0)}33%{transform:translate(-8px,5px)}66%{transform:translate(6px,-7px)}100%{transform:translate(0,0)}}
-.cs-vignette{position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.75) 100%)}
-.cs-roll{position:absolute;left:50%;top:0;width:min(680px,92vw);
-  text-align:center;will-change:transform;transform:translate3d(-50%,100vh,0)}
-/* TANPA animasi di base rule — animasi HANYA dimulai lewat class cs-rolling di overlay,
-   setelah video selesai + preload foto tuntas + --cs-end & duration di-set oleh JS.
-   Animasi memakai TRANSFORM (GPU/compositor) bukan top (layout) — top menyebabkan
-   re-layout tiap frame → macet/micin pada konten 55 foto. */
-.cs-rolling .cs-roll{animation:csScrollUp linear forwards}
-/* Jarak animasi DIHITUNG via JS dari scrollHeight aktual (set CSS var --cs-end)
-   — bukan -260% statis yang salah untuk konten panjang/pendek. Default aman: */
-@keyframes csScrollUp{from{transform:translate3d(-50%,100vh,0)}to{transform:translate3d(-50%,var(--cs-end,-260%),0)}}
-.cs-title-block{margin-bottom:8vh}
-.cs-main-title{font-size:clamp(2.6rem,7vw,4.4rem);font-weight:400;color:#f5efe0;
-  letter-spacing:.18em;margin:0 0 1rem;text-shadow:0 2px 24px rgba(212,175,55,.35)}
-.cs-sub-title{font-style:italic;color:#d4af37;opacity:.9;font-size:clamp(1rem,2.6vw,1.3rem)}
-.cs-item{margin:9vh 0;animation:csFade 1.1s ease}
-@keyframes csFade{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
-.cs-spotlight img.cs-photo{width:min(440px,80vw);aspect-ratio:3/4;object-fit:cover;
-  border-radius:10px;box-shadow:0 24px 70px rgba(212,175,55,.22),0 4px 18px rgba(0,0,0,.6);
-  border:1px solid rgba(212,175,55,.35)}
-.cs-cap{margin-top:.8rem;color:#d4af37;font-style:italic;letter-spacing:.12em;font-size:.9rem}
-.cs-side{display:flex;align-items:center;gap:1.4rem;text-align:left;background:rgba(255,255,255,.025);
-  border:1px solid rgba(212,175,55,.16);border-radius:14px;padding:1rem 1.3rem;max-width:560px;margin:7vh auto}
-.cs-role{color:#d4af37;text-transform:uppercase;letter-spacing:.3em;font-size:.72rem;min-width:64px}
-.cs-name{font-size:1.15rem;color:#f5efe0;font-style:italic}
-.cs-photo-sm{width:96px;height:96px;object-fit:cover;border-radius:10px;margin-left:auto;
-  border:1px solid rgba(212,175,55,.3);box-shadow:0 6px 20px rgba(0,0,0,.5)}
-.cs-end-block{margin-top:14vh;text-align:center}
-.cs-the-end{font-size:clamp(2rem,6vw,3.2rem);color:#d4af37;letter-spacing:.4em;text-shadow:0 2px 30px rgba(212,175,55,.4)}
-.cs-closing{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  padding:2rem;text-align:center;font-size:clamp(1.3rem,3.6vw,2rem);font-style:italic;color:#f5efe0;
-  opacity:0;visibility:hidden;transition:opacity 1.4s ease;background:rgba(0,0,0,.92);z-index:3}
-.cs-closing.show{opacity:1;visibility:visible}
-@media (max-width:640px){
-  .cs-side{flex-direction:column;text-align:center;gap:.6rem}
-  .cs-photo-sm{margin:0 auto}
-  .cs-roll{width:94vw}
+#credit-scene-overlay *{box-sizing:border-box}
+
+#cs-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;
+  opacity:0;transition:opacity .6s ease;z-index:1}
+#cs-video.show{opacity:1}
+
+.cs-world,.cs-scenes{position:absolute;inset:0}
+.cs-scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;animation:csIn .9s ease backwards}
+.cs-scene.out{opacity:0;transition:opacity .3s linear .9s}
+@keyframes csIn{from{opacity:0}to{opacity:1}}
+
+/* ---------- judul & kartu bab ---------- */
+.cs-presents{font-size:clamp(.85rem,1.8vw,1.15rem);letter-spacing:.42em;text-transform:uppercase;color:var(--gold);
+  opacity:0;animation:csIn 2s ease 1s both;margin-bottom:2.2rem}
+.cs-main-title{margin:0;font-weight:400;font-size:clamp(2.8rem,9vw,6rem);color:var(--ivory);
+  text-shadow:0 2px 40px rgba(212,175,55,.35);animation:csTitle 4s cubic-bezier(.2,.7,.2,1) .5s both}
+@keyframes csTitle{from{opacity:0;filter:blur(14px);letter-spacing:.6em}to{opacity:1;filter:blur(0);letter-spacing:.22em}}
+.cs-rule{width:clamp(80px,16vw,180px);height:1px;margin:1.6rem auto;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;animation:csIn 2s ease 2s both}
+.cs-sub-title{font-style:italic;font-size:clamp(1.05rem,2.6vw,1.6rem);color:var(--ivory);opacity:0;animation:csIn 2s ease 2.6s both}
+
+.cs-card-date{font-size:clamp(.85rem,1.8vw,1.1rem);letter-spacing:.4em;text-transform:uppercase;color:var(--gold);
+  animation:csIn 1.4s ease .3s both}
+.cs-card-title{margin:.9rem 0 0;font-weight:400;font-size:clamp(2.2rem,7vw,4.4rem);color:var(--ivory);
+  text-shadow:0 2px 30px rgba(212,175,55,.3);animation:csTitle 3s cubic-bezier(.2,.7,.2,1) .5s both;padding:0 6vw}
+.cs-card-place{font-style:italic;font-size:clamp(1rem,2.4vw,1.5rem);color:var(--ivory);opacity:.9;
+  animation:csIn 1.6s ease 1.6s both;padding:0 8vw}
+
+/* ---------- grup foto ---------- */
+.cs-bgblur{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1.2s ease;
+  filter:saturate(1.35) brightness(.5)}
+.cs-bgblur.ready{opacity:.9}
+.cs-photos{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:2.2vw;margin-top:-2vh}
+.cs-frame{margin:0;overflow:hidden;border-radius:6px;background:#111;
+  box-shadow:0 22px 70px rgba(0,0,0,.65),0 0 0 1px rgba(212,175,55,.28);animation:csIn .9s ease backwards}
+.cs-kb{display:block;width:auto;height:auto;opacity:0;transition:opacity .6s ease;will-change:transform;
+  animation:csKB linear both}
+.cs-kb.ready{opacity:1}
+@keyframes csKB{from{transform:scale(var(--s0,1)) translate3d(0,0,0)}
+  to{transform:scale(var(--s1,1.08)) translate3d(var(--x1,0),var(--y1,0),0)}}
+.cs-n1 .cs-kb{max-height:64vh;max-width:84vw}
+.cs-n2 .cs-kb{max-height:58vh;max-width:38vw}
+.cs-n3 .cs-kb{max-height:52vh;max-width:27vw}
+@media (max-aspect-ratio:1/1){
+  .cs-n1 .cs-kb{max-height:62vh;max-width:90vw}
+  .cs-n2 .cs-photos{flex-direction:column;gap:2vh}
+  .cs-n2 .cs-kb{max-height:30vh;max-width:78vw}
+  .cs-n3 .cs-photos{gap:2vw}
+  .cs-n3 .cs-kb{max-height:42vh;max-width:29vw}
 }
+.cs-sub{position:absolute;left:0;right:0;bottom:calc(var(--bar) + 2.5vh);z-index:2;padding:0 8vw;
+  font-style:italic;font-size:clamp(1.05rem,2.4vw,1.6rem);color:var(--ivory);
+  text-shadow:0 2px 14px rgba(0,0,0,.9);opacity:0;animation:csSub 3s ease .9s both}
+@keyframes csSub{0%{opacity:0;transform:translateY(8px)}12%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0}}
+
+/* ---------- credits bergulir ---------- */
+.cs-s-credits{justify-content:flex-start;align-items:stretch}
+.cs-credits-bg{position:absolute;inset:0}
+.cs-side{position:absolute;top:0;bottom:0;right:0;width:46%;display:flex;align-items:center;justify-content:center}
+.cs-side-frame{position:absolute;margin:0;opacity:0;animation:csSide linear both}
+@keyframes csSide{0%{opacity:0}10%{opacity:1}72%{opacity:1}100%{opacity:0}}
+.cs-side-img{display:block;max-height:64vh;max-width:40vw;border-radius:6px;
+  box-shadow:0 22px 70px rgba(0,0,0,.65),0 0 0 1px rgba(212,175,55,.28);
+  --s0:1;--s1:1.07;--x1:0%;--y1:-1%;animation:csKB 10s linear both}
+.cs-roll-mask{position:absolute;inset:0;
+  -webkit-mask-image:linear-gradient(transparent 0,#000 16%,#000 84%,transparent 100%);
+  mask-image:linear-gradient(transparent 0,#000 16%,#000 84%,transparent 100%)}
+.cs-roll{position:absolute;top:0;left:0;width:54%;padding:0 4vw;text-align:center;
+  transform:translate3d(0,100vh,0);will-change:transform}
+.cs-roll.go{animation:csRoll cubic-bezier(.25,.25,.45,1) both}
+@keyframes csRoll{from{transform:translate3d(0,100vh,0)}to{transform:translate3d(0,var(--cs-end,-200%),0)}}
+.cs-block{margin:0 0 8vh}
+.cs-role{font-size:clamp(.8rem,1.5vw,1rem);letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem}
+.cs-name{font-size:clamp(1.5rem,3.2vw,2.4rem);color:var(--ivory);line-height:1.25;text-shadow:0 2px 18px rgba(0,0,0,.8)}
+.cs-note{font-style:italic;font-size:clamp(.95rem,1.8vw,1.2rem);color:var(--ivory);opacity:.7;margin-top:.6rem}
+@media (max-aspect-ratio:1/1){
+  .cs-roll{width:100%;padding:0 7vw}
+  .cs-side{width:100%;opacity:.3}
+  .cs-side-img{max-width:none;max-height:none;width:100vw;height:100vh;object-fit:cover;border-radius:0;box-shadow:none}
+}
+
+/* ---------- The End & post-credit ---------- */
+.cs-the-end{font-size:clamp(2.4rem,8vw,5rem);letter-spacing:.4em;padding-left:.4em;color:var(--gold);
+  text-shadow:0 2px 40px rgba(212,175,55,.45);animation:csTitle 3.5s cubic-bezier(.2,.7,.2,1) both}
+.cs-end-note{margin-top:1.4rem;font-style:italic;font-size:clamp(1rem,2.4vw,1.5rem);color:var(--ivory);
+  opacity:0;animation:csIn 2s ease 2.4s both}
+.cs-s-post{animation:csIn 1.6s ease backwards;background:#000}
+.cs-post-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 35%;
+  opacity:0;transition:opacity 2.5s ease;animation:csPostZoom linear both}
+.cs-post-img.ready{opacity:.92}
+@keyframes csPostZoom{from{transform:scale(1.02)}to{transform:scale(1.15) translate3d(-1%,-1%,0)}}
+.cs-post-shade{position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(0,0,0,.85) 100%)}
+.cs-post-box{position:absolute;left:0;right:0;bottom:11vh;padding:0 7vw;text-align:center}
+.cs-post-msg{min-height:3.2em;font-style:italic;font-size:clamp(1.25rem,3.2vw,2.1rem);line-height:1.4;color:var(--ivory);
+  text-shadow:0 2px 18px rgba(0,0,0,.95)}
+.cs-post-hint{margin-top:1.2rem;font-size:clamp(.95rem,2vw,1.25rem);letter-spacing:.12em;color:var(--gold);
+  opacity:0;transition:opacity 1.6s ease;text-shadow:0 2px 12px rgba(0,0,0,.9)}
+.cs-post-hint.show{opacity:1}
+
+/* ---------- efek sinema ---------- */
+.cs-dust{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
+.cs-dust span{position:absolute;bottom:-10px;border-radius:50%;
+  background:radial-gradient(circle,#ffe9a8,rgba(212,175,55,0) 70%);animation:csDust linear infinite}
+@keyframes csDust{from{transform:translate3d(0,0,0)}to{transform:translate3d(34px,-112vh,0)}}
+.cs-leak{position:absolute;inset:0;pointer-events:none;z-index:4;mix-blend-mode:screen;opacity:.12;
+  background:radial-gradient(ellipse at 0% 20%,rgba(255,150,70,.55),transparent 55%),
+             radial-gradient(ellipse at 100% 90%,rgba(255,90,120,.35),transparent 50%);
+  animation:csLeak 12s ease-in-out infinite}
+@keyframes csLeak{0%,100%{opacity:.1}50%{opacity:.36}}
+.cs-grain{position:absolute;inset:-20%;pointer-events:none;z-index:4;opacity:.08;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.6'/></svg>");
+  animation:csGrain .5s steps(4) infinite}
+@keyframes csGrain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(0,0)}}
+.cs-vignette{position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.7) 100%)}
+.cs-bar{position:absolute;left:0;right:0;height:0;background:#000;z-index:6;pointer-events:none;
+  transition:height 2.5s cubic-bezier(.4,0,.2,1)}
+.cs-bar-top{top:0}.cs-bar-bot{bottom:0}
+.cs-open-bars .cs-bar{height:var(--bar)}
+.cs-post .cs-bar{height:0}
+
+/* ---------- UI ---------- */
+.cs-loader{position:absolute;inset:0;z-index:8;background:#000;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1.1rem;transition:opacity .8s ease}
+.cs-loader.hide{opacity:0;visibility:hidden;pointer-events:none}
+.cs-loader-t{font-style:italic;font-size:clamp(1.1rem,2.6vw,1.5rem);color:var(--ivory);opacity:.85}
+.cs-loader-bar{width:min(220px,50vw);height:2px;background:rgba(255,255,255,.12);overflow:hidden;border-radius:2px}
+.cs-loader-bar i{display:block;width:0;height:100%;background:var(--gold);transition:width .4s ease}
+.cs-skip{position:absolute;z-index:9;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;
+  font:inherit;font-size:1rem;letter-spacing:.08em;color:var(--ivory);background:rgba(0,0,0,.35);
+  border:1px solid rgba(245,239,224,.3);border-radius:999px;padding:.35rem .95rem;cursor:pointer;
+  opacity:0;pointer-events:none;transition:opacity .6s ease}
+.cs-skip.show{opacity:.75;pointer-events:auto}
+.cs-skip:hover{opacity:1}
+.cs-pause-ind{position:absolute;z-index:9;left:50%;top:50%;transform:translate(-50%,-50%);font-size:2.2rem;
+  letter-spacing:.1em;color:var(--ivory);opacity:0;pointer-events:none;transition:opacity .25s ease;
+  text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.cs-paused .cs-pause-ind{opacity:.85}
+.cs-paused *{animation-play-state:paused!important}
+
 @media (prefers-reduced-motion:reduce){
-  .cs-grain{animation:none}.cs-item{animation:none}
+  .cs-kb,.cs-post-img,.cs-side-img{animation:none}
+  .cs-grain,.cs-leak,.cs-dust span{animation:none}
 }
+.cs-reduced .cs-kb,.cs-reduced .cs-post-img,.cs-reduced .cs-side-img,
+.cs-reduced .cs-grain,.cs-reduced .cs-leak,.cs-reduced .cs-dust span{animation:none}

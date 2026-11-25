@@ -1,115 +1,55 @@
-# Romantic Cinematic End Credits — Panduan
+# Cinematic End Credits v2 — Panduan
 
-Fitur credit scene sinematik untuk arcade. Dipicu **hanya** oleh tombol
-**"Kembali ke Dashboard"** di bagian bawah *The Final Surprise* (setelah hadiah dibuka).
+Credit scene dipicu **hanya** oleh tombol **"Kembali ke Dashboard"** di bagian bawah
+*The Final Surprise* (`arcade/app.js` → `finalCredits()` → `CreditScene.run({onDone})`).
 
-## Alur pemutaran
+## Alur (± 4 menit, pas dengan lagu)
 
-1. Tombol diklik → navigasi normal dicegah → minta fullscreen (jika gagal/dergan
-   menolak → overlay fixed full-viewport, tetap jalan).
-2. **Video pembuka** dari Cloudinary (jika URL sudah diisi di `config.json`).
-   Video gagal dimuat / autoplay ditolak → langsung lanjut ke credits, tidak crash.
-3. Fade ke layar hitam → **rolling credits**: foto dari GitHub diacak sekali per
-   pemutaran (Fisher–Yates), setiap foto tampil tepat satu kali.
-4. Pesan romantis penutup (durasi di `config.json`) → fade out → keluar fullscreen
-   → kembali ke Dashboard.
-5. Musik latar arcade (`__arcadeBgAudio`) di-fade down saat credits dan di-restore
-   setelahnya — **tidak ada instance audio kedua**.
+| Detik | Adegan |
+|---|---|
+| (sebelum) | Video pembuka Cloudinary (opsional, `cloudinaryVideoUrl`) |
+| 0–9 | Kartu judul "Our Story" |
+| 9–196 | 6 bab: kartu bab (tanggal · judul · tempat) → foto dengan Ken Burns, tempo berubah per bab, kadang 2–3 foto sekaligus |
+| 196–230 | Credits bergulir (lucu) + foto bergantian di sisi kanan |
+| 230–237 | The End |
+| 238–252 | Post-credit: foto favorit layar penuh, pesan diketik huruf demi huruf, "kado susulan" |
 
-## Struktur
+Kontrol: **tap** = pause/lanjut, **Lewati ›** (pojok kanan atas) = keluar. Tab disembunyikan = otomatis pause.
 
-```
-credit-scene/
-├── photos/          # photo-001.jpg … photo-055.jpg (55 foto, disimpan di GitHub)
-├── photos.json      # manifest: expectedCount + daftar path foto tersedia
-├── config.json      # URL video Cloudinary + pesan penutup (TANPA kredensial!)
-├── credits.js       # logika credit scene (modul, window.CreditScene)
-├── credits.css      # gaya sinematik (hitam, serif ivory/gold, grain, vignette)
-└── README.md
-```
+## Yang diedit lewat `config.json`
 
-## 1. Upload video ke Cloudinary & ambil URL delivery
+- `title`, `subtitle`, `presents` — kartu judul.
+- `music` — `src` (path dari root repo), `durationSec` (cadangan; durasi asli dibaca otomatis), `volume`, `fadeInSec`, `fadeOutSec`.
+  Durasi semua adegan **dihitung ulang otomatis** dari panjang lagu, jadi ganti lagu = tinggal ganti `src`.
+- `chapters` — tiap bab: `title`, `date`, `place`, `from`/`to` (nomor foto, 1 = `photo-001.jpg`),
+  `pace` (>1 lebih pelan, <1 lebih cepat), `layout` (`single` atau `mix`), `captions` (teks di bawah foto).
+  Pastikan rentang `from`–`to` semua bab menutup seluruh foto tanpa tumpang tindih.
+- `credits.sections` — daftar `role` / `names` / `note`. `credits.seconds` = lama credits bergulir.
+  `credits.sidePhotos` = nomor foto yang muncul bergantian di sisi kanan.
+- `theEnd`, `theEndNote` — teks penutup.
+- `postCredit` — `photo` (nomor foto), `focusY` (0–100, bagian vertikal foto yang dijaga di layar lebar), `message`, `hint`, `holdSeconds`.
 
-1. Login ke [cloudinary.com](https://cloudinary.com) → Console → **Media Library**.
-2. Klik **Upload** → pilih video pembuka (MP4, disarankan ≤ 25 MB & ≤ 60 detik).
-3. Setelah terunggah, klik video → **Copy URL** (delivery URL, bukan URL editor).
-   Formatnya kira-kira:
-   `https://res.cloudinary.com/<CLOUD_NAME>/video/upload/v<VERSION>/<PUBLIC_ID>.mp4`
-4. URL ini **public delivery URL** — aman untuk frontend. **JANGAN PERNAH** menyimpan
-   API Key / API Secret / signing token di repo. Yang dibutuhkan hanya URL delivery.
+## Foto
 
-## 2. Simpan URL video di config
+`photos.json` tetap daftar urutan kronologis (`photo-001` … `photo-055`). Foto sudah diperkecil
+ke sisi terpanjang 1280 px (±11 MB total, dulu 164 MB). Jika menambah foto: perkecil dulu
+ke ±1280 px, tambahkan ke `photos.json`, lalu masukkan nomornya ke salah satu bab di `config.json`.
 
-Buka `credit-scene/config.json`, isi:
+## Musik
 
-```json
-{
-  "cloudinaryVideoUrl": "https://res.cloudinary.com/CLOUD_NAME/video/upload/v1234/video_pembuka.mp4",
-  ...
-}
-```
+Credits memakai ulang elemen audio arcade (`window.__arcadeBgAudio`), mengganti lagunya ke
+*Young and Beautiful*, lalu **memulihkan** lagu, posisi, volume, dan status play/pause semula.
+Catatan: file mp3 di `arcade/music/` adalah hasil unduhan berhak cipta. Untuk repo publik, pertimbangkan
+repo privat atau musik bebas royalti.
 
-Selama `cloudinaryVideoUrl` kosong `""`, credit scene **langsung mulai dari rolling
-credits** tanpa video (perilaku default saat ini).
+## Uji cepat dari tengah
 
-## 3. Menambah foto ke GitHub
+Di konsol browser: `CreditScene.run({ startAt: 190 })` mulai dari detik 190 (mis. langsung ke credits).
 
-1. Letakkan foto di `credit-scene/photos/` dengan nama pola `photo-001.jpg` …
-   `photo-055.jpg` (3 digit, urut).
-2. Commit & push ke `main`.
+## Catatan teknis
 
-> Foto saat ini: **55/55 sudah diupload dan direname** ke pola ini
-> (rename dari nama asli IMG_*.jpg dilakukan di commit awal fitur ini).
-
-## 4. Memperbarui manifest (`photos.json`)
-
-- Tambah/hapus path pada array `photos` sesuai file yang benar-benar ada.
-- Naikkan/turunkan `expectedCount` jika target total berubah.
-- Skrip bantu membangun ulang manifest dari isi folder (jalankan di root repo):
-
-```bash
-python3 - <<'EOF'
-import json, os
-d = "credit-scene/photos"
-files = sorted(f for f in os.listdir(d) if f.lower().endswith((".jpg", ".jpeg", ".png")))
-paths = [f"credit-scene/photos/{f}" for f in files]
-json.dump({"expectedCount": 55, "photos": paths}, open("credit-scene/photos.json", "w"), indent=2)
-print(f"{len(paths)} foto dalam manifest")
-EOF
-```
-
-## 5. Verifikasi kelengkapan 55 foto
-
-```bash
-python3 - <<'EOF'
-import json, os, urllib.request
-man = json.load(open("credit-scene/photos.json"))
-paths = man["photos"]
-print("manifest:", len(paths), "| expected:", man["expectedCount"])
-assert len(paths) == len(set(paths)), "ADA PATH DUPLIKAT"
-missing = [p for p in paths if not os.path.exists(p)]
-print("hilang di repo:", missing or "tidak ada")
-# cek online (opsional):
-base = "https://taufik-hid.github.io/birthday25/"
-bad = []
-for p in paths:
-    try:
-        urllib.request.urlopen(base + p, timeout=10)
-    except Exception:
-        bad.append(p)
-print("gagal diakses online:", bad or "tidak ada")
-EOF
-```
-
-Saat runtime, `credits.js` juga memvalidasi: jumlah vs `expectedCount`, duplikasi
-path, dan foto gagal dimuat (di-skip aman dengan peringatan di console — halaman
-tidak crash).
-
-## Fallback yang ditangani
-
-- Fullscreen ditolak / tidak didukung → overlay fixed full-viewport
-- Video gagal / autoplay diblok → skip video, langsung credits
-- Foto individual gagal dimuat → di-skip (preload timeout 8s), tidak crash
-- Manifest hilang → credits kosong + pesan penutup tetap jalan
-- ESC menutup fullscreen browser secara native; setelah credits selesai,
-  `exitFullscreen()` dipanggil otomatis
+- Animasi hanya memakai `transform` dan `opacity`. Latar blur dibuat dari kanvas 24 px yang dibesarkan CSS (murah di HP).
+- Foto dimuat bertahap (8 pertama ditunggu dengan layar "Menyiapkan kenangan…", sisanya di latar belakang).
+- Bila terjadi error di tengah jalan, overlay tetap dibersihkan dan pengguna kembali ke dashboard.
+- Font Cormorant Garamond dimuat dari Google Fonts; jika offline, jatuh ke Georgia.
+- `prefers-reduced-motion` mematikan Ken Burns, grain, dan debu.
