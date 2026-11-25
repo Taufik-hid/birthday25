@@ -247,6 +247,15 @@
 
   function sceneCard(ch) {
     var el = h("div", "cs-scene cs-s-card");
+    // intro photo opsional per-chapter (config: chapters[].introPhoto, path relatif root repo)
+    if (ch.introPhoto) {
+      var ip = new Image();
+      ip.className = "cs-card-photo";
+      ip.alt = ch.title || "";
+      ip.decoding = "async";
+      ip.src = new URL(ch.introPhoto, REPO_BASE).href;
+      el.appendChild(ip);
+    }
     el.appendChild(h("div", "cs-card-date", ch.date || ""));
     el.appendChild(h("h2", "cs-card-title", ch.title || ""));
     el.appendChild(h("div", "cs-rule"));

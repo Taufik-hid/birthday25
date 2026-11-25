@@ -30,6 +30,9 @@
 
 .cs-card-date{font-size:clamp(.85rem,1.8vw,1.1rem);letter-spacing:.4em;text-transform:uppercase;color:var(--gold);
   animation:csIn 1.4s ease .3s both}
+.cs-card-photo{width:min(220px,42vw);aspect-ratio:1;object-fit:cover;border-radius:12px;
+  margin-bottom:1.2rem;box-shadow:0 18px 50px rgba(0,0,0,.55),0 0 0 1px rgba(212,175,55,.35);
+  opacity:0;animation:csIn 1.8s ease .1s both}
 .cs-card-title{margin:.9rem 0 0;font-weight:400;font-size:clamp(2.2rem,7vw,4.4rem);color:var(--ivory);
   text-shadow:0 2px 30px rgba(212,175,55,.3);animation:csTitle 3s cubic-bezier(.2,.7,.2,1) .5s both;padding:0 6vw}
 .cs-card-place{font-style:italic;font-size:clamp(1rem,2.4vw,1.5rem);color:var(--ivory);opacity:.9;

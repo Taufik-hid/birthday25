@@ -49,7 +49,8 @@
       "date": "Desember 2023 – April 2024",
       "place": "Dieng · suhu di bawah 10°",
       "from": 32, "to": 40, "pace": 0.85, "layout": "mix",
-      "captions": ["Eksplor kota ke-3 kita"]
+      "captions": ["Eksplor kota ke-3 kita"],
+      "introPhoto": "media/foto5.jpg"
     },
     {
       "title": "Masih Berlanjut",
