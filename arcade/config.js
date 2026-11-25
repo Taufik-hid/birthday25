@@ -1,6 +1,6 @@
 // ✏️ EDIT FILE INI untuk personalisasi. Gunakan {nama} dan {pengirim} di teks mana pun.
 window.CONFIG={
-partner:"Ambar", sender:"Your Prince", birthday:"2026-11-20",
+partner:"Ambar", sender:"Your Prince", birthday:"2026-11-08",
 subtitle:"Game nya gampang kok, setelah ini baru boleh buka hadiahnya 💗",
 // a = nomor jawaban benar (mulai dari 0)
 quiz:[
